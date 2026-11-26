@@ -34,7 +34,7 @@ void main() {
 
     // Verify customer auth portal elements
     expect(find.byType(CustomerAuthScreen), findsOneWidget);
-    expect(find.text('BuyLanka'), findsOneWidget);
+    expect(find.text('YUMMY'), findsOneWidget);
     expect(find.text('Sign In'), findsOneWidget);
     expect(find.text('Register'), findsOneWidget);
   });

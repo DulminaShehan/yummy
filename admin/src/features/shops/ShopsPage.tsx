@@ -98,12 +98,14 @@ export const ShopsPage: React.FC = () => {
     }
   }
 
-  const sriLankanDistricts = [
-    'Colombo', 'Gampaha', 'Kalutara', 'Kandy', 'Matale', 'Nuwara Eliya',
-    'Galle', 'Matara', 'Hambantota', 'Jaffna', 'Kilinochchi', 'Mannar',
-    'Vavuniya', 'Mullaitivu', 'Batticaloa', 'Ampara', 'Trincomalee',
-    'Kurunegala', 'Puttalam', 'Anuradhapura', 'Polonnaruwa', 'Badulla',
-    'Monaragala', 'Ratnapura', 'Kegalle'
+  const globalMarkets = [
+    'California (US)', 'New York (US)', 'Texas (US)', 'Florida (US)', 'Washington (US)',
+    'Greater London (UK)', 'Manchester (UK)',
+    'Dubai (AE)', 'Abu Dhabi (AE)',
+    'Central Region (SG)',
+    'New South Wales (AU)', 'Victoria (AU)',
+    'Ontario (CA)', 'British Columbia (CA)',
+    'Western Province (LK)', 'Central Province (LK)'
   ]
 
   return (
@@ -214,7 +216,7 @@ export const ShopsPage: React.FC = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8125rem' }}>
                       <MapPin size={14} color="var(--primary)" />
                       <span>
-                        {shop.city || '—'}, <strong>{shop.district || 'Sri Lanka'}</strong>
+                        {shop.city || '—'}, <strong>{shop.district || 'Global Market'}</strong>
                       </span>
                     </div>
                   </td>
@@ -334,14 +336,14 @@ export const ShopsPage: React.FC = () => {
 
           <div className="form-grid-2">
             <Select
-              label="District"
+              label="Operating State / Region"
               value={district}
               onChange={(e) => setDistrict(e.target.value)}
-              options={sriLankanDistricts.map((d) => ({ value: d, label: d }))}
+              options={globalMarkets.map((d) => ({ value: d, label: d }))}
             />
             <Input
               label="Contact Phone"
-              placeholder="+94 91 333 4455"
+              placeholder="+1 555 333 4455"
               value={contactPhone}
               onChange={(e) => setContactPhone(e.target.value)}
             />

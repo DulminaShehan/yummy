@@ -17,7 +17,7 @@ class MapUtils {
     return 12742 * asin(sqrt(a)); // 2 * R * asin...
   }
 
-  /// Calculate realistic Sri Lankan traffic ETA in minutes (avg speed 25km/h + 3 min buffer)
+  /// Calculate realistic traffic ETA in minutes (avg speed 25-30 km/h + 3 min buffer)
   static int calculateEstimatedMinutes(double distanceKm) {
     if (distanceKm <= 0.2) return 2;
     final minutes = ((distanceKm / 25.0) * 60).round() + 3;

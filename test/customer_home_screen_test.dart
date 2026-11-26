@@ -197,13 +197,13 @@ void main() {
     await tester.pumpAndSettle();
 
     // 1. Verify Branded Header
-    expect(find.text('BuyLanka'), findsOneWidget);
+    expect(find.text('YUMMY'), findsOneWidget);
     expect(find.byIcon(Icons.notifications_outlined), findsOneWidget);
     expect(find.text('2'), findsOneWidget); // unread notification badge
 
     // 2. Verify Delivery Location
     expect(find.text('DELIVER TO'), findsOneWidget);
-    expect(find.text('Colombo 05, Western Province'), findsOneWidget);
+    expect(find.text('Downtown Metro, Central Zone'), findsOneWidget);
 
     // 3. Verify Search Bar
     expect(find.text('Search for food, Kottu, Burger, Rice...'), findsOneWidget);

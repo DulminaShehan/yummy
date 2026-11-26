@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:buylanka/core/constants/app_colors.dart';
+import 'package:buylanka/core/constants/app_constants.dart';
 import 'package:buylanka/models/product_model.dart';
 import 'package:buylanka/features/seller/products/controllers/products_controller.dart';
 
@@ -70,17 +71,125 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
   }
 
   Future<void> _pickImage() async {
-    final picked = await _imagePicker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1000,
-      maxHeight: 1000,
-      imageQuality: 80,
-    );
+    _showImageSourcePicker();
+  }
 
-    if (picked != null) {
-      setState(() {
-        _newImages.add(picked);
-      });
+  void _showImageSourcePicker({int? replaceNewIndex, int? replaceExistingIndex}) {
+    final isReplacing = replaceNewIndex != null || replaceExistingIndex != null;
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Text(
+                  isReplacing ? 'Replace Food Photo' : 'Select Food Photo',
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                ),
+                const SizedBox(height: 12),
+                ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: AppColors.primarySurface,
+                    child: Icon(Icons.camera_alt_rounded, color: AppColors.primary),
+                  ),
+                  title: const Text('Take Photo with Camera', style: TextStyle(fontWeight: FontWeight.w600)),
+                  subtitle: const Text('Capture delicious food with your phone camera', style: TextStyle(fontSize: 12)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _pickImageFromSource(ImageSource.camera, replaceNewIndex: replaceNewIndex, replaceExistingIndex: replaceExistingIndex);
+                  },
+                ),
+                ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: AppColors.primarySurface,
+                    child: Icon(Icons.photo_library_rounded, color: AppColors.primary),
+                  ),
+                  title: const Text('Choose from Gallery', style: TextStyle(fontWeight: FontWeight.w600)),
+                  subtitle: const Text('Select a photo from your device gallery', style: TextStyle(fontSize: 12)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _pickImageFromSource(ImageSource.gallery, replaceNewIndex: replaceNewIndex, replaceExistingIndex: replaceExistingIndex);
+                  },
+                ),
+                if (isReplacing) ...[
+                  const Divider(),
+                  ListTile(
+                    leading: const CircleAvatar(
+                      backgroundColor: Color(0xFFFFEBEE),
+                      child: Icon(Icons.delete_outline_rounded, color: AppColors.danger),
+                    ),
+                    title: const Text('Remove Photo', style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.danger)),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      setState(() {
+                        if (replaceNewIndex != null && replaceNewIndex < _newImages.length) {
+                          _newImages.removeAt(replaceNewIndex);
+                        } else if (replaceExistingIndex != null && replaceExistingIndex < _existingImages.length) {
+                          _existingImages.removeAt(replaceExistingIndex);
+                        }
+                      });
+                    },
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickImageFromSource(
+    ImageSource source, {
+    int? replaceNewIndex,
+    int? replaceExistingIndex,
+  }) async {
+    try {
+      final picked = await _imagePicker.pickImage(
+        source: source,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 80,
+      );
+
+      if (picked != null && mounted) {
+        setState(() {
+          if (replaceNewIndex != null && replaceNewIndex < _newImages.length) {
+            _newImages[replaceNewIndex] = picked;
+          } else if (replaceExistingIndex != null && replaceExistingIndex < _existingImages.length) {
+            _existingImages.removeAt(replaceExistingIndex);
+            _newImages.add(picked);
+          } else {
+            _newImages.add(picked);
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('[BuyLanka ImagePicker] Error picking image: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to select image. Please check camera and gallery permissions.'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
     }
   }
 
@@ -88,8 +197,19 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final price = double.tryParse(_priceController.text.trim()) ?? 0.0;
-    final originalPrice = double.tryParse(_originalPriceController.text.trim());
-    final stock = int.tryParse(_stockController.text.trim()) ?? 0;
+    if (price <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid price greater than ${AppConstants.currencySymbol}0'),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+      return;
+    }
+
+    final originalPriceText = _originalPriceController.text.trim();
+    final originalPrice = originalPriceText.isNotEmpty ? double.tryParse(originalPriceText) : null;
+    final stock = int.tryParse(_stockController.text.trim()) ?? 50;
     final prepTime = int.tryParse(_prepTimeController.text.trim()) ?? 15;
 
     bool success = false;
@@ -143,11 +263,15 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
             backgroundColor: AppColors.success,
           ),
         );
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       } else {
-        final error = ref.read(productsControllerProvider).errorMessage ?? 'Failed to save product';
+        final error = ref.read(productsControllerProvider).errorMessage ?? 'Failed to save menu item. Please try again.';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error), backgroundColor: AppColors.danger),
+          SnackBar(
+            content: Text(error),
+            backgroundColor: AppColors.danger,
+            duration: const Duration(seconds: 4),
+          ),
         );
       }
     }
@@ -181,7 +305,7 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Product deleted successfully'), backgroundColor: AppColors.success),
         );
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       }
     }
   }
@@ -246,73 +370,125 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
                     const SizedBox(width: 10),
 
                     // Existing Images
-                    ..._existingImages.map(
-                      (url) => Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(14),
-                              child: CachedNetworkImage(
-                                imageUrl: url,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Positioned(
-                              top: 4,
-                              right: 4,
-                              child: InkWell(
-                                onTap: () => setState(() => _existingImages.remove(url)),
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.black54,
-                                    shape: BoxShape.circle,
+                    ..._existingImages.asMap().entries.map(
+                      (entry) {
+                        final index = entry.key;
+                        final url = entry.value;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: InkWell(
+                            onTap: () => _showImageSourcePicker(replaceExistingIndex: index),
+                            borderRadius: BorderRadius.circular(14),
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: CachedNetworkImage(
+                                    imageUrl: url,
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(
+                                      width: 100,
+                                      height: 100,
+                                      color: AppColors.surfaceVariant,
+                                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                    ),
+                                    errorWidget: (context, url, error) => Container(
+                                      width: 100,
+                                      height: 100,
+                                      color: AppColors.surfaceVariant,
+                                      child: const Icon(Icons.broken_image_rounded, color: AppColors.textMuted),
+                                    ),
                                   ),
-                                  child: const Icon(Icons.close, color: Colors.white, size: 14),
                                 ),
-                              ),
+                                Positioned(
+                                  bottom: 4,
+                                  left: 4,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black54,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Text('Tap to change', style: TextStyle(color: Colors.white, fontSize: 9)),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: InkWell(
+                                    onTap: () => setState(() => _existingImages.removeAt(index)),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black54,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.close, color: Colors.white, size: 14),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     ),
 
                     // New Local Images
-                    ..._newImages.map(
-                      (file) => Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(14),
-                              child: Image.file(
-                                File(file.path),
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Positioned(
-                              top: 4,
-                              right: 4,
-                              child: InkWell(
-                                onTap: () => setState(() => _newImages.remove(file)),
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.black54,
-                                    shape: BoxShape.circle,
+                    ..._newImages.asMap().entries.map(
+                      (entry) {
+                        final index = entry.key;
+                        final file = entry.value;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: InkWell(
+                            onTap: () => _showImageSourcePicker(replaceNewIndex: index),
+                            borderRadius: BorderRadius.circular(14),
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: Image.file(
+                                    File(file.path),
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
                                   ),
-                                  child: const Icon(Icons.close, color: Colors.white, size: 14),
                                 ),
-                              ),
+                                Positioned(
+                                  bottom: 4,
+                                  left: 4,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black54,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Text('Tap to change', style: TextStyle(color: Colors.white, fontSize: 9)),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: InkWell(
+                                    onTap: () => setState(() => _newImages.removeAt(index)),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black54,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.close, color: Colors.white, size: 14),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -355,10 +531,10 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
                     child: TextFormField(
                       controller: _priceController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Price (Rs.)',
-                        hintText: '850',
-                        prefixText: 'Rs. ',
+                      decoration: InputDecoration(
+                        labelText: 'Price (${AppConstants.currencySymbol})',
+                        hintText: '8.50',
+                        prefixText: '${AppConstants.currencySymbol} ',
                       ),
                       validator: (val) {
                         if (val == null || val.trim().isEmpty) return 'Enter price';
@@ -372,10 +548,10 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
                     child: TextFormField(
                       controller: _originalPriceController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Original Price (Rs.)',
+                      decoration: InputDecoration(
+                        labelText: 'Original Price (${AppConstants.currencySymbol})',
                         hintText: 'Optional discount',
-                        prefixText: 'Rs. ',
+                        prefixText: '${AppConstants.currencySymbol} ',
                       ),
                     ),
                   ),
@@ -443,10 +619,17 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
               ElevatedButton(
                 onPressed: productsState.isSaving ? null : _handleSave,
                 child: productsState.isSaving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    ? const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          ),
+                          SizedBox(width: 10),
+                          Text('Uploading photo & saving dish...'),
+                        ],
                       )
                     : Text(isEdit ? 'Save Dish Changes' : 'Add to Restaurant Menu'),
               ),

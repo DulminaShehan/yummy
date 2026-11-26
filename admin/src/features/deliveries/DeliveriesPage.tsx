@@ -90,7 +90,7 @@ export const DeliveriesPage: React.FC = () => {
     <div>
       <PageHeader
         title="Delivery Dispatch & Logistics"
-        subtitle="Coordinate pickup routes, assign delivery riders, and monitor Sri Lanka territory orders"
+        subtitle="Coordinate pickup routes, assign delivery riders, and monitor global delivery dispatches"
       />
 
       {/* Filter Tabs */}

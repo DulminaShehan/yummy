@@ -29,7 +29,7 @@ class CustomerHomeState {
     this.selectedCategory,
     this.isLoading = false,
     this.errorMessage,
-    this.currentDeliveryAddress = 'Colombo 05, Western Province',
+    this.currentDeliveryAddress = 'Downtown Metro, Central Zone',
   });
 
   CustomerHomeState copyWith({

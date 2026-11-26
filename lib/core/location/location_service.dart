@@ -32,7 +32,7 @@ class LocationService {
     return LocationStatus.ready;
   }
 
-  /// Get current GPS position with fallback to Colombo city center if unavailable
+  /// Get current GPS position with fallback handling when device location services are unavailable
   static Future<Position?> getCurrentPosition() async {
     try {
       final status = await checkAndRequestPermission();

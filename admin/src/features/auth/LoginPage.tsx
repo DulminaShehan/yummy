@@ -26,7 +26,7 @@ export const LoginPage: React.FC = () => {
     setLoading(false)
 
     if (result.success) {
-      success('Welcome back to BuyLanka Admin Portal!')
+      success('Welcome back to YUMMY Admin Portal!')
       navigate('/')
     } else {
       toastError(result.error || 'Authentication failed.')
@@ -77,7 +77,7 @@ export const LoginPage: React.FC = () => {
             <Sparkles size={28} />
           </div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
-            BuyLanka Admin
+            YUMMY Admin
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.35rem', lineHeight: 1.4 }}>
             Sign in with your authorized administrator credentials to manage the marketplace
@@ -89,7 +89,7 @@ export const LoginPage: React.FC = () => {
           <Input
             label="Admin Email"
             type="email"
-            placeholder="admin@buylanka.lk"
+            placeholder="admin@yummy.lk"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             icon={<Mail size={18} />}

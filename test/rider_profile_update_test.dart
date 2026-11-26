@@ -62,7 +62,7 @@ void main() {
     // Verify profile details
     expect(find.text('Kasun Chamara Perera'), findsOneWidget);
     expect(find.text('kasun@buylanka.lk'), findsOneWidget);
-    expect(find.text('Verified BuyLanka Rider'), findsOneWidget);
+    expect(find.text('Verified YUMMY Rider'), findsOneWidget);
     expect(find.text('WP BCD-1234'), findsOneWidget);
     expect(find.text('Honda Dio 110'), findsOneWidget);
     expect(find.text('Matte Blue'), findsOneWidget);

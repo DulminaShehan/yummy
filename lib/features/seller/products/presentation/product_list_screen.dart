@@ -31,11 +31,14 @@ class ProductListScreen extends ConsumerWidget {
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
         label: const Text('Add Dish / Item', style: TextStyle(fontWeight: FontWeight.w700)),
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final res = await Navigator.push<bool>(
             context,
             MaterialPageRoute(builder: (_) => const AddEditProductScreen()),
           );
+          if (res == true) {
+            ref.read(productsControllerProvider.notifier).loadCategoriesAndProducts();
+          }
         },
       ),
       body: Column(
@@ -156,11 +159,14 @@ class ProductListScreen extends ConsumerWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          final res = await Navigator.push<bool>(
             context,
             MaterialPageRoute(builder: (_) => AddEditProductScreen(product: product)),
           );
+          if (res == true) {
+            ref.read(productsControllerProvider.notifier).loadCategoriesAndProducts();
+          }
         },
         child: Padding(
           padding: const EdgeInsets.all(12),

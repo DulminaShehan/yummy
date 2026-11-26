@@ -44,7 +44,7 @@ export const Spinner: React.FC<SpinnerProps> = ({
       >
         {spinnerElement}
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: 500 }}>
-          Loading BuyLanka Admin...
+          Loading YUMMY Admin...
         </p>
       </div>
     )

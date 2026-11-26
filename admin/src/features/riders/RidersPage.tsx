@@ -734,7 +734,7 @@ export const RidersPage: React.FC = () => {
                   <div><span style={{ color: 'var(--text-muted)' }}>Vehicle Model:</span> <strong>{detailsRider.vehicle_model || 'Standard'}</strong></div>
                   <div><span style={{ color: 'var(--text-muted)' }}>Vehicle Color:</span> <strong>{detailsRider.vehicle_color || 'Default'}</strong></div>
                   <div><span style={{ color: 'var(--text-muted)' }}>Driving License:</span> <strong>{detailsRider.driving_license_number}</strong></div>
-                  <div><span style={{ color: 'var(--text-muted)' }}>Operational Territory:</span> <strong>{detailsRider.assigned_zone || 'Colombo District'}</strong></div>
+                  <div><span style={{ color: 'var(--text-muted)' }}>Operational Territory:</span> <strong>{detailsRider.assigned_zone || 'Central Metro District'}</strong></div>
                 </div>
               </div>
             </div>
@@ -759,7 +759,7 @@ export const RidersPage: React.FC = () => {
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         title="Register Delivery Rider"
-        subtitle="Onboard a logistics driver to the BuyLanka fleet"
+        subtitle="Onboard a logistics driver to the YUMMY fleet"
         size="lg"
       >
         <form onSubmit={handleCreateRider}>
@@ -821,11 +821,11 @@ export const RidersPage: React.FC = () => {
           </div>
 
           <Input
-            label="Assigned Delivery District / Zone"
-            placeholder="e.g. Colombo Central & Colombo 03/07"
+            label="Assigned Delivery Territory / Zone"
+            placeholder="e.g. Metro Zone 1 / Downtown"
             value={assignedZone}
             onChange={(e) => setAssignedZone(e.target.value)}
-            helperText="The primary territory or district where this rider will receive pickup dispatches"
+            helperText="The primary territory, city, or district where this rider will receive pickup dispatches"
             required
           />
 

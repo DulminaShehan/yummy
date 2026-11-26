@@ -230,7 +230,7 @@ class _RiderApplicationStatusScreenState
 
                       // Subtitle
                       Text(
-                        'Your application is waiting for Admin approval. Our BuyLanka team will review your identity and vehicle documents shortly.',
+                        'Your application is waiting for Admin approval. Our YUMMY team will review your identity and vehicle documents shortly.',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 13,
@@ -295,7 +295,7 @@ class _RiderApplicationStatusScreenState
                         icon: Icons.delivery_dining_rounded,
                         color: AppColors.textSecondary,
                         title: 'Account Activated',
-                        subtitle: 'Receive orders and start earning with BuyLanka.',
+                        subtitle: 'Receive orders and start earning with YUMMY.',
                         isDone: false,
                         showLine: false,
                       ),

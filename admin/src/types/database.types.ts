@@ -1,4 +1,4 @@
-// PostgreSQL / Supabase Database Type Definitions for BuyLanka
+// PostgreSQL / Supabase Database Type Definitions for YUMMY
 
 export type Json =
   | string

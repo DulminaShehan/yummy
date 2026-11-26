@@ -1,18 +1,28 @@
-// Currency and Date Formatters for Sri Lankan Marketplace (LKR)
+// Global Multi-Currency and Date Formatters for YUMMY Platform
+
+export function formatCurrency(
+  amount: number | null | undefined,
+  currencyCode: string = 'USD',
+  locale: string = 'en-US'
+): string {
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    return '$0.00'
+  }
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currencyCode,
+      currencyDisplay: 'narrowSymbol',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount)
+  } catch {
+    return `$${amount.toFixed(2)}`
+  }
+}
 
 export function formatLKR(amount: number | null | undefined): string {
-  if (amount === null || amount === undefined || isNaN(amount)) {
-    return 'Rs. 0.00'
-  }
-  return new Intl.NumberFormat('en-LK', {
-    style: 'currency',
-    currency: 'LKR',
-    currencyDisplay: 'narrowSymbol',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
-    .format(amount)
-    .replace('LKR', 'Rs.')
+  return formatCurrency(amount, 'USD', 'en-US')
 }
 
 export function formatDate(dateString: string | null | undefined): string {

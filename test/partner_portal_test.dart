@@ -33,7 +33,7 @@ void main() {
     // 1. Verify Header & Branding
     expect(find.text('Partner Portal'), findsOneWidget);
     expect(find.text('Join as a Restaurant Partner or Delivery Rider'), findsOneWidget);
-    expect(find.text('BuyLanka'), findsOneWidget);
+    expect(find.text('YUMMY'), findsOneWidget);
     expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
 
     // 2. Verify Partner Selection Cards
@@ -67,7 +67,7 @@ void main() {
 
     expect(find.text('Rider Registration'), findsOneWidget);
     expect(find.text('Personal Information'), findsOneWidget);
-    expect(find.text('Full Name (as per NIC)'), findsOneWidget);
+    expect(find.text('Full Name (as per Legal ID)'), findsOneWidget);
 
     // 6. Test Back navigation returns to Partner Portal
     await tester.tap(find.byIcon(Icons.arrow_back_rounded).last);
@@ -89,9 +89,10 @@ void main() {
     expect(find.text('Contact Phone Number'), findsOneWidget);
     expect(find.text('Restaurant Location'), findsOneWidget);
     expect(find.text('GPS Auto-fill'), findsOneWidget);
+    expect(find.text('Operating Country / Market'), findsOneWidget);
     expect(find.text('Street Address / Landmark'), findsOneWidget);
     expect(find.text('City / Town'), findsOneWidget);
-    expect(find.text('District'), findsOneWidget);
+    expect(find.text('State / Region'), findsOneWidget);
     expect(find.text('Create Password'), findsOneWidget);
     expect(find.text('Register Restaurant Partner →'), findsOneWidget);
 

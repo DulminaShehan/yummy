@@ -32,12 +32,12 @@ void main() {
     expect(find.text('Personal Information'), findsOneWidget);
 
     // Verify Fields
-    expect(find.text('Full Name (as per NIC)'), findsOneWidget);
+    expect(find.text('Full Name (as per Legal ID)'), findsOneWidget);
     expect(find.text('Email Address'), findsOneWidget);
     expect(find.text('Account Password'), findsOneWidget);
     expect(find.text('Phone Number'), findsOneWidget);
     expect(find.text('Date of Birth'), findsOneWidget);
-    expect(find.text('NIC Number'), findsOneWidget);
+    expect(find.text('ID / Document Number'), findsOneWidget);
     expect(find.text('Residential Address'), findsOneWidget);
 
     // Verify Continue Button
@@ -87,7 +87,7 @@ void main() {
     expect(find.text('Application Status'), findsOneWidget);
     expect(find.text('PENDING APPROVAL'), findsOneWidget);
     expect(find.text('Your rider application has been submitted successfully.'), findsOneWidget);
-    expect(find.text('Your application is waiting for Admin approval. Our BuyLanka team will review your identity and vehicle documents shortly.'), findsOneWidget);
+    expect(find.text('Your application is waiting for Admin approval. Our YUMMY team will review your identity and vehicle documents shortly.'), findsOneWidget);
     expect(find.text('Verification Progress'), findsOneWidget);
     expect(find.text('Application Submitted'), findsOneWidget);
     expect(find.text('Documents Under Review'), findsOneWidget);

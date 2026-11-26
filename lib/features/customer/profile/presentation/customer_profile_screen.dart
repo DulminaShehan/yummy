@@ -190,7 +190,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
     final authNotifier = ref.read(authControllerProvider.notifier);
 
     final fullName = profile?.fullName ?? 'Valued Customer';
-    final email = profile?.email ?? 'customer@buylanka.lk';
+    final email = profile?.email ?? 'customer@yummy.lk';
     final phone = profile?.phoneNumber ?? 'Not provided';
     final avatarUrl = profile?.avatarUrl;
 
@@ -378,7 +378,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
                     _buildProfileTile(
                       icon: Icons.headset_mic_outlined,
                       title: '24/7 Customer Support',
-                      subtitle: 'Call BuyLanka helpline: +94 11 200 9000',
+                      subtitle: 'Call YUMMY helpline: +94 11 200 9000',
                       onTap: () => MapUtils.makePhoneCall('+94 11 200 9000'),
                     ),
                   ],
@@ -397,7 +397,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
                       context: context,
                       builder: (ctx) => AlertDialog(
                         title: const Text('Sign Out?'),
-                        content: const Text('Are you sure you want to sign out of your BuyLanka account?'),
+                        content: const Text('Are you sure you want to sign out of your YUMMY account?'),
                         actions: [
                           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
                           ElevatedButton(
@@ -426,7 +426,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
               ),
 
               const SizedBox(height: 32),
-              const Text('BuyLanka v1.0.0 • Proudly Sri Lankan 🇱🇰', style: TextStyle(fontSize: 12, color: AppColors.textLight)),
+              const Text('YUMMY v1.0.0 • Fresh Food. Fast Delivery.', style: TextStyle(fontSize: 12, color: AppColors.textLight)),
             ],
           ),
         ),

@@ -296,7 +296,7 @@ class _CustomerAuthScreenState extends ConsumerState<CustomerAuthScreen> {
                     top: 0,
                     child: Opacity(
                       opacity: 0.0,
-                      child: Text('BuyLanka'),
+                      child: Text('YUMMY'),
                     ),
                   ),
                 ],
@@ -950,7 +950,7 @@ class _CustomerAuthScreenState extends ConsumerState<CustomerAuthScreen> {
                         if (success && mounted) {
                           AuthFeedbackHelper.showSuccess(
                             context,
-                            'Account created successfully! Welcome to BuyLanka 🎉',
+                            'Account created successfully! Welcome to YUMMY 🎉',
                           );
                         }
                       }

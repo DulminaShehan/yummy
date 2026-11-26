@@ -287,7 +287,7 @@ export const SellersPage: React.FC = () => {
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         title="Register New Marketplace Vendor"
-        subtitle="Onboard a Sri Lankan merchant to list products on BuyLanka"
+        subtitle="Onboard a merchant to list food and dishes on YUMMY"
         size="lg"
       >
         <form onSubmit={handleCreateSeller}>
@@ -518,7 +518,7 @@ export const SellersPage: React.FC = () => {
                 marginBottom: '1.5rem',
               }}
             >
-              <strong>⚠️ Warning:</strong> This action will permanently remove this seller, their registered shops, and product catalog items from BuyLanka.
+              <strong>⚠️ Warning:</strong> This action will permanently remove this seller, their registered shops, and product catalog items from YUMMY.
             </div>
 
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>

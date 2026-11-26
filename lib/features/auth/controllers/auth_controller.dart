@@ -75,7 +75,7 @@ class AuthController extends StateNotifier<AuthStateData> {
         profile = ProfileModel(
           id: user.id,
           fullName: user.userMetadata?['full_name'] ?? 'Valued Customer',
-          email: user.email ?? 'customer@buylanka.lk',
+          email: user.email ?? 'customer@yummy.lk',
           phoneNumber: user.userMetadata?['phone_number'],
           role: user.userMetadata?['role'] ?? 'customer',
           status: 'active',

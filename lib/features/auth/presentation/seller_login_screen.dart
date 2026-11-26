@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:buylanka/core/constants/app_colors.dart';
+import 'package:buylanka/core/constants/country_config.dart';
 import 'package:buylanka/core/location/location_service.dart';
 import 'package:buylanka/core/widgets/auth_feedback_banner.dart';
 import 'package:buylanka/features/auth/controllers/auth_controller.dart';
@@ -21,33 +22,7 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
   PartnerRole _selectedRole = PartnerRole.restaurant;
   int _selectedTabIndex = 0; // 0 = Sign In, 1 = Register
 
-  static const List<String> _districts = [
-    'Colombo',
-    'Gampaha',
-    'Kalutara',
-    'Kandy',
-    'Matale',
-    'Nuwara Eliya',
-    'Galle',
-    'Matara',
-    'Hambantota',
-    'Jaffna',
-    'Kilinochchi',
-    'Mannar',
-    'Vavuniya',
-    'Mullaitivu',
-    'Batticaloa',
-    'Ampara',
-    'Trincomalee',
-    'Kurunegala',
-    'Puttalam',
-    'Anuradhapura',
-    'Polonnaruwa',
-    'Badulla',
-    'Monaragala',
-    'Ratnapura',
-    'Kegalle',
-  ];
+  CountryConfig _sellerCountry = CountryConfig.defaultCountry;
 
   // Sign In Controllers & State
   final _signInEmailController = TextEditingController();
@@ -63,7 +38,7 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
   final _sellerPhoneController = TextEditingController();
   final _sellerAddressController = TextEditingController();
   final _sellerCityController = TextEditingController();
-  String _sellerDistrict = 'Colombo';
+  String _sellerDistrict = 'California';
   final _sellerPasswordController = TextEditingController();
   bool _sellerObscure = true;
   bool _isLocating = false;
@@ -433,7 +408,7 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
       _showPendingApprovalDialog(
         title: 'Application Submitted! 🎉',
         message:
-            'Your Restaurant "${_sellerShopNameController.text.trim()}" in $_sellerDistrict has been successfully registered. You can sign in once verified by BuyLanka administration.',
+            'Your Restaurant "${_sellerShopNameController.text.trim()}" in $_sellerDistrict has been successfully registered. You can sign in once verified by YUMMY administration.',
       );
     }
   }
@@ -567,7 +542,7 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'BuyLanka',
+                    'YUMMY',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w800,
@@ -923,7 +898,7 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
       }
     } else {
       if (_selectedRole == PartnerRole.restaurant) {
-        message = 'Register your restaurant. Applications are verified by BuyLanka operations.';
+        message = 'Register your restaurant. Applications are verified by YUMMY operations.';
         icon = Icons.verified_user_outlined;
       } else {
         message = 'Register as a delivery rider. Submit your vehicle and identity documents for quick approval.';
@@ -1017,7 +992,7 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
                 fontWeight: FontWeight.w500,
               ),
               decoration: _inputDecoration(
-                hintText: isRestaurant ? 'restaurant@buylanka.lk' : 'rider@buylanka.lk',
+                hintText: isRestaurant ? 'restaurant@yummy.lk' : 'rider@yummy.lk',
                 prefixIcon: Icons.email_outlined,
               ),
               validator: (v) {
@@ -1300,6 +1275,43 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
             ),
             const SizedBox(height: 10),
 
+            // Operating Country / Market
+            Text(
+              'Operating Country / Market',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            DropdownButtonFormField<String>(
+              initialValue: _sellerCountry.code,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w500,
+              ),
+              decoration: _inputDecoration(
+                hintText: 'Select Country',
+                prefixIcon: Icons.public_rounded,
+              ),
+              items: CountryConfig.supportedCountries.map((c) => DropdownMenuItem(
+                value: c.code,
+                child: Text('${c.name} (${c.dialCode})'),
+              )).toList(),
+              onChanged: (code) {
+                if (code != null) {
+                  final found = CountryConfig.findByCode(code);
+                  setState(() {
+                    _sellerCountry = found;
+                    _sellerDistrict = found.regions.first;
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 14),
+
             // Street Address
             Text(
               'Street Address / Landmark',
@@ -1313,14 +1325,14 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
             TextFormField(
               controller: _sellerAddressController,
               decoration: _inputDecoration(
-                hintText: 'e.g. No. 45, Galle Road, Bambalapitiya',
+                hintText: 'e.g. 500 Howard Street, Suite 200',
                 prefixIcon: Icons.pin_drop_outlined,
               ),
               validator: (v) => (v == null || v.trim().isEmpty) ? 'Please enter street address' : null,
             ),
             const SizedBox(height: 14),
 
-            // City and District Row
+            // City and State / District Row
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1342,7 +1354,7 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
                       TextFormField(
                         controller: _sellerCityController,
                         decoration: _inputDecoration(
-                          hintText: 'e.g. Colombo 04',
+                          hintText: 'e.g. San Francisco',
                           prefixIcon: Icons.location_city_rounded,
                         ),
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter city' : null,
@@ -1352,14 +1364,14 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
                 ),
                 const SizedBox(width: 12),
 
-                // District Dropdown
+                // State / District Dropdown
                 Expanded(
                   flex: 5,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'District',
+                        'State / Region',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
@@ -1368,7 +1380,9 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
                       ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
-                        initialValue: _sellerDistrict,
+                        initialValue: _sellerCountry.regions.contains(_sellerDistrict)
+                            ? _sellerDistrict
+                            : _sellerCountry.regions.first,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
                           color: AppColors.textPrimary,
@@ -1379,7 +1393,7 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
                           prefixIcon: Icons.map_outlined,
                         ),
                         isExpanded: true,
-                        items: _districts
+                        items: _sellerCountry.regions
                             .map((d) => DropdownMenuItem(
                                   value: d,
                                   child: Text(d, style: GoogleFonts.plusJakartaSans(fontSize: 13.5)),
@@ -1494,7 +1508,7 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
 
           // Description
           Text(
-            'Join the BuyLanka delivery fleet. Earn competitive rates delivering delicious food to customers across Sri Lanka with flexible hours.',
+            'Join the YUMMY delivery fleet. Earn competitive rates delivering delicious food to customers across Sri Lanka with flexible hours.',
             textAlign: TextAlign.center,
             style: GoogleFonts.plusJakartaSans(
               fontSize: 13,

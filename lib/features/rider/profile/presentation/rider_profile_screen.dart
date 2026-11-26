@@ -288,8 +288,8 @@ class _RiderProfileScreenState extends ConsumerState<RiderProfileScreen> {
     final profile = authState.profile;
     final rider = authState.rider;
 
-    final fullName = profile?.fullName ?? 'BuyLanka Rider';
-    final email = profile?.email ?? 'rider@buylanka.lk';
+    final fullName = profile?.fullName ?? 'YUMMY Rider';
+    final email = profile?.email ?? 'rider@yummy.lk';
     final phone = profile?.phoneNumber ?? '+94 77 123 4567';
     final vehicleType = rider?.vehicleTypeDisplay ?? 'Motorbike';
     final vehicleNumber = rider?.vehicleNumber ?? 'WP BCD-1234';
@@ -392,7 +392,7 @@ class _RiderProfileScreenState extends ConsumerState<RiderProfileScreen> {
                         Icon(Icons.verified_rounded, size: 14, color: AppColors.success),
                         SizedBox(width: 4),
                         Text(
-                          'Verified BuyLanka Rider',
+                          'Verified YUMMY Rider',
                           style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.success),
                         ),
                       ],

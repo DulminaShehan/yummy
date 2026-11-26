@@ -342,7 +342,7 @@ class AuthRepository {
     final profile = await getProfile(user.id);
     if (profile == null) {
       await _client.auth.signOut();
-      throw const AuthException('Seller profile not found. Please contact BuyLanka administration.');
+      throw const AuthException('Seller profile not found. Please contact YUMMY administration.');
     }
 
     if (profile.role != 'seller') {
@@ -363,7 +363,7 @@ class AuthRepository {
     if (profile.status != 'active' || (seller != null && seller.verificationStatus != 'verified')) {
       await _client.auth.signOut();
       throw const AuthException(
-        'Account Suspended or Rejected. Please contact BuyLanka vendor support (operations@buylanka.lk).',
+        'Account Suspended or Rejected. Please contact YUMMY vendor support (operations@yummy.lk).',
       );
     }
 
@@ -402,7 +402,7 @@ class AuthRepository {
 
     if (profile == null) {
       await _client.auth.signOut();
-      throw const AuthException('Rider profile not found. Please contact BuyLanka administration.');
+      throw const AuthException('Rider profile not found. Please contact YUMMY administration.');
     }
 
     if (profile.role != 'rider') {
@@ -440,7 +440,7 @@ class AuthRepository {
     if (profile.status == 'suspended' || (rider != null && rider.verificationStatus == 'suspended')) {
       await _client.auth.signOut();
       throw const AuthException(
-        'Rider Account Suspended. Please contact BuyLanka operations support.',
+        'Rider Account Suspended. Please contact YUMMY operations support.',
       );
     }
 
@@ -482,7 +482,7 @@ class AuthRepository {
       if (profile.status == 'pending' || (seller != null && seller.verificationStatus == 'pending')) {
         await _client.auth.signOut();
         throw const AuthException(
-          'Your Restaurant account is currently PENDING Super Admin approval. You will receive access once approved by BuyLanka.',
+          'Your Restaurant account is currently PENDING Super Admin approval. You will receive access once approved by YUMMY.',
         );
       }
     } else if (profile.role == 'rider') {

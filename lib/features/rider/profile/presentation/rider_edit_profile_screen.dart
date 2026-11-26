@@ -254,7 +254,7 @@ class _RiderEditProfileScreenState extends ConsumerState<RiderEditProfileScreen>
                 ],
               ),
               content: Text(
-                'Personal details were updated successfully. Your new vehicle plate, type, or license details have been sent to BuyLanka Admin for verification.\n\nYour existing approved vehicle details will remain active until approved.',
+                'Personal details were updated successfully. Your new vehicle plate, type, or license details have been sent to YUMMY Admin for verification.\n\nYour existing approved vehicle details will remain active until approved.',
                 style: GoogleFonts.plusJakartaSans(fontSize: 14, color: const Color(0xFF718096), height: 1.4),
               ),
               actions: [
@@ -528,7 +528,7 @@ class _RiderEditProfileScreenState extends ConsumerState<RiderEditProfileScreen>
                     _buildTextField(
                       controller: TextEditingController(text: profile?.email ?? ''),
                       label: 'Registered Email',
-                      hint: 'rider@buylanka.lk',
+                      hint: 'rider@yummy.lk',
                       icon: Icons.email_outlined,
                       readOnly: true,
                       helperText: 'Account email cannot be modified directly for security.',

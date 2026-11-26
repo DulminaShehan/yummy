@@ -308,7 +308,7 @@ class _CustomerHomeScreenState extends ConsumerState<CustomerHomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'BuyLanka',
+                        'YUMMY',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
@@ -317,7 +317,7 @@ class _CustomerHomeScreenState extends ConsumerState<CustomerHomeScreen> {
                         ),
                       ),
                       Text(
-                        'Food & Grocery Delivery',
+                        'Food. Delivered.',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w600,
@@ -1948,8 +1948,8 @@ class _CustomerHomeScreenState extends ConsumerState<CustomerHomeScreen> {
       return ShopModel(
         id: shopId,
         sellerId: '',
-        name: 'BuyLanka Partner Spot',
-        slug: 'buylanka-spot',
+        name: 'YUMMY Partner Spot',
+        slug: 'yummy-spot',
         status: 'approved',
         rating: 4.8,
         totalReviews: 120,

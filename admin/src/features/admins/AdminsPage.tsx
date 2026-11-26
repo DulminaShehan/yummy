@@ -524,7 +524,7 @@ export const AdminsPage: React.FC = () => {
           <Input
             label="Admin Email Address *"
             type="email"
-            placeholder="kasun.admin@buylanka.lk"
+            placeholder="kasun.admin@yummy.lk"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             icon={<Mail size={18} />}
@@ -638,7 +638,7 @@ export const AdminsPage: React.FC = () => {
               Are you sure you want to suspend {selectedAdmin?.full_name || selectedAdmin?.email}?
             </p>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
-              This administrator will immediately lose access to the BuyLanka Admin Portal and won't be able to moderate orders, shops, sellers, or riders until re-activated.
+              This administrator will immediately lose access to the YUMMY Admin Portal and won't be able to moderate orders, shops, sellers, or riders until re-activated.
             </p>
           </div>
         </div>

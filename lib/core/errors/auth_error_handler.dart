@@ -27,7 +27,7 @@ class AuthErrorHandler {
   static const String pendingRiderApproval =
       'Your Delivery Rider application is currently pending approval. Operations will verify your vehicle & license.';
   static const String suspendedAccount =
-      'Your account has been suspended. Please contact BuyLanka support (operations@buylanka.lk).';
+      'Your account has been suspended. Please contact YUMMY support (operations@yummy.lk).';
   static const String partnerAccessDenied =
       'Access Denied: This portal is for verified Restaurant and Rider partners only. Customers, please sign in from the main app.';
   static const String sessionExpired = 'Your session has expired. Please sign in again.';

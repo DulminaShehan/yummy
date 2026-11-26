@@ -103,12 +103,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 lineHeight: 1.2,
               }}
             >
-              BuyLanka
+              YUMMY
               <span
                 style={{
                   fontSize: '0.625rem',
-                  backgroundColor: 'rgba(5, 150, 105, 0.3)',
-                  color: '#34d399',
+                  backgroundColor: 'rgba(21, 101, 192, 0.4)',
+                  color: '#90caf9',
                   padding: '0.15rem 0.4rem',
                   borderRadius: 'var(--radius-sm)',
                   textTransform: 'uppercase',
@@ -119,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               </span>
             </h2>
             <p style={{ fontSize: '0.7rem', color: 'var(--sidebar-text-muted)', marginTop: '2px' }}>
-              Sri Lanka Marketplace
+              Food. Delivered.
             </p>
           </div>
         </div>
@@ -237,7 +237,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 textOverflow: 'ellipsis',
               }}
             >
-              {user?.email || 'admin@buylanka.lk'}
+              {user?.email || 'admin@yummy.lk'}
             </p>
           </div>
         </div>

@@ -320,7 +320,7 @@ class _RiderRegistrationScreenState extends ConsumerState<RiderRegistrationScree
           _buildSectionHeader(
             icon: Icons.person_outline_rounded,
             title: 'Personal Information',
-            subtitle: 'Enter your legal identity details as on your Sri Lankan NIC.',
+            subtitle: 'Enter your legal identity details as on your official government ID.',
           ),
           const SizedBox(height: 18),
 
@@ -329,7 +329,7 @@ class _RiderRegistrationScreenState extends ConsumerState<RiderRegistrationScree
           const SizedBox(height: 20),
 
           // Full Name
-          _buildLabel('Full Name (as per NIC)'),
+          _buildLabel('Full Name (as per Legal ID)'),
           TextFormField(
             controller: _fullNameController,
             textCapitalization: TextCapitalization.words,
@@ -447,17 +447,17 @@ class _RiderRegistrationScreenState extends ConsumerState<RiderRegistrationScree
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLabel('NIC Number'),
+                    _buildLabel('ID / Document Number'),
                     TextFormField(
                       controller: _nicController,
                       textCapitalization: TextCapitalization.characters,
                       decoration: _inputDecoration(
-                        hint: 'e.g. 200012345678 / 981234567V',
+                        hint: 'e.g. Passport, National ID, or License #',
                         prefixIcon: Icons.perm_identity_rounded,
                       ),
                       validator: (v) {
-                        if (v == null || v.trim().isEmpty) return 'Enter NIC #';
-                        if (v.trim().length < 9) return 'Invalid NIC';
+                        if (v == null || v.trim().isEmpty) return 'Enter ID #';
+                        if (v.trim().length < 5) return 'Invalid ID #';
                         return null;
                       },
                     ),
@@ -682,8 +682,8 @@ class _RiderRegistrationScreenState extends ConsumerState<RiderRegistrationScree
 
         _buildDocumentCard(
           docType: 'nic_front',
-          title: 'NIC Front Image',
-          description: 'Front side of your National Identity Card with clear photo and number.',
+          title: 'Government ID Front Image',
+          description: 'Front side of your Government ID, Passport, or Identity Card with clear photo.',
           icon: Icons.badge_rounded,
           file: regState.documents['nic_front'],
         ),
@@ -691,8 +691,8 @@ class _RiderRegistrationScreenState extends ConsumerState<RiderRegistrationScree
 
         _buildDocumentCard(
           docType: 'nic_back',
-          title: 'NIC Back Image',
-          description: 'Reverse side of your National Identity Card showing the barcode/address.',
+          title: 'Government ID Back Image',
+          description: 'Reverse side of your ID card or secondary verification page.',
           icon: Icons.badge_outlined,
           file: regState.documents['nic_back'],
         ),
@@ -701,7 +701,7 @@ class _RiderRegistrationScreenState extends ConsumerState<RiderRegistrationScree
         _buildDocumentCard(
           docType: 'driving_license',
           title: 'Driving Licence Image',
-          description: 'Valid Sri Lankan driving licence clearly showing categories.',
+          description: 'Valid driving licence clearly matching vehicle categories.',
           icon: Icons.card_membership_rounded,
           file: regState.documents['driving_license'],
         ),
@@ -939,7 +939,7 @@ class _RiderRegistrationScreenState extends ConsumerState<RiderRegistrationScree
         _buildSectionHeader(
           icon: Icons.fact_check_rounded,
           title: 'Review and Submit',
-          subtitle: 'Please check your information before submitting to BuyLanka Operations.',
+          subtitle: 'Please check your information before submitting to YUMMY Operations.',
         ),
         const SizedBox(height: 18),
 
@@ -951,7 +951,7 @@ class _RiderRegistrationScreenState extends ConsumerState<RiderRegistrationScree
             {'label': 'Full Name', 'value': _fullNameController.text},
             {'label': 'Email', 'value': _emailController.text},
             {'label': 'Phone', 'value': _phoneController.text},
-            {'label': 'NIC Number', 'value': _nicController.text},
+            {'label': 'ID Number', 'value': _nicController.text},
             {
               'label': 'Date of Birth',
               'value': _dateOfBirth != null
@@ -1012,8 +1012,8 @@ class _RiderRegistrationScreenState extends ConsumerState<RiderRegistrationScree
                 ],
               ),
               const SizedBox(height: 12),
-              _buildDocCheckItem('NIC Front Image', regState.hasNicFront),
-              _buildDocCheckItem('NIC Back Image', regState.hasNicBack),
+              _buildDocCheckItem('ID Front Image', regState.hasNicFront),
+              _buildDocCheckItem('ID Back Image', regState.hasNicBack),
               _buildDocCheckItem('Driving Licence Image', regState.hasDrivingLicense),
               _buildDocCheckItem('Vehicle Registration Document', regState.hasVehicleReg),
               _buildDocCheckItem('Vehicle Insurance Document', regState.hasVehicleInsurance),

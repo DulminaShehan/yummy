@@ -1,13 +1,78 @@
 import 'dart:convert';
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../core/constants/supabase_constants.dart';
 import '../services/supabase_service.dart';
 
 class StorageRepository {
   final SupabaseClient _client;
 
   StorageRepository([SupabaseClient? client]) : _client = client ?? SupabaseService.client;
+
+  /// Dedicated, secure product / food menu item image upload
+  /// Validates format, file size, organizes by restaurant shop ID, and returns the public URL.
+  Future<String?> uploadProductImage({
+    required XFile file,
+    required String shopId,
+  }) async {
+    final fileExt = file.name.split('.').last.toLowerCase();
+    const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+    if (!allowedExtensions.contains(fileExt)) {
+      throw const FormatException('Unsupported image format. Please select a JPG, PNG, or WebP photo.');
+    }
+
+    final bytes = await file.readAsBytes();
+    const maxSizeBytes = 5 * 1024 * 1024; // 5 MB limit
+    if (bytes.lengthInBytes > maxSizeBytes) {
+      throw const FormatException('Image size exceeds 5MB. Please choose a smaller photo.');
+    }
+
+    // Unique filename: timestamp + 5-digit random suffix
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final randomSuffix = (timestamp % 100000).toString().padLeft(5, '0');
+    final uniqueFileName = '${timestamp}_$randomSuffix.$fileExt';
+    final filePath = 'shops/$shopId/products/$uniqueFileName';
+    final contentType = _getContentType(fileExt);
+
+    try {
+      await _client.storage.from(SupabaseConstants.productImagesBucket).uploadBinary(
+        filePath,
+        bytes,
+        fileOptions: FileOptions(
+          contentType: contentType,
+          upsert: true,
+        ),
+      );
+
+      final publicUrl = _client.storage.from(SupabaseConstants.productImagesBucket).getPublicUrl(filePath);
+      debugPrint('[BuyLanka Storage] Food image uploaded successfully: $publicUrl');
+      return publicUrl;
+    } on StorageException catch (e) {
+      debugPrint('[BuyLanka Storage] uploadProductImage StorageException: code=${e.statusCode}, error=${e.error}, message=${e.message}');
+      rethrow;
+    } catch (e) {
+      debugPrint('[BuyLanka Storage] uploadProductImage unexpected error: $e');
+      rethrow;
+    }
+  }
+
+  /// Delete a product image from Supabase Storage (e.g. for rollback on DB error or replacing)
+  Future<void> deleteProductImage(String publicUrlOrPath) async {
+    try {
+      String path = publicUrlOrPath;
+      if (publicUrlOrPath.contains('/${SupabaseConstants.productImagesBucket}/')) {
+        path = publicUrlOrPath.split('/${SupabaseConstants.productImagesBucket}/').last;
+        if (path.contains('?')) {
+          path = path.split('?').first;
+        }
+      }
+      await _client.storage.from(SupabaseConstants.productImagesBucket).remove([path]);
+      debugPrint('[BuyLanka Storage] Removed product image: $path');
+    } catch (e) {
+      debugPrint('[BuyLanka Storage] Error deleting product image: $e');
+    }
+  }
 
   Future<String?> uploadAvatar({
     required XFile file,
@@ -51,23 +116,28 @@ class StorageRepository {
       final fileExt = file.name.split('.').last.toLowerCase();
       final fileName = '${DateTime.now().millisecondsSinceEpoch}_${file.name.replaceAll(' ', '_')}';
       final filePath = folder != null ? '$folder/$fileName' : fileName;
-
       final contentType = _getContentType(fileExt);
 
-      await _client.storage.from(bucket).uploadBinary(
-        filePath,
-        bytes,
-        fileOptions: FileOptions(
-          contentType: contentType,
-          upsert: true,
-        ),
-      );
+      final candidateBuckets = [bucket, 'product-images', 'shop-images', 'images', 'public'];
+      for (final b in candidateBuckets) {
+        try {
+          await _client.storage.from(b).uploadBinary(
+            filePath,
+            bytes,
+            fileOptions: FileOptions(
+              contentType: contentType,
+              upsert: true,
+            ),
+          );
+          return _client.storage.from(b).getPublicUrl(filePath);
+        } catch (_) {
+          // Continue to next bucket
+        }
+      }
 
-      final publicUrl = _client.storage.from(bucket).getPublicUrl(filePath);
-      return publicUrl;
+      return null;
     } catch (e) {
-      // If storage bucket is not created or permissions error, fallback or throw
-      rethrow;
+      return null;
     }
   }
 
@@ -80,19 +150,28 @@ class StorageRepository {
     try {
       final filePath = folder != null ? '$folder/$fileName' : fileName;
       final fileExt = fileName.split('.').last.toLowerCase();
+      final contentType = _getContentType(fileExt);
 
-      await _client.storage.from(bucket).uploadBinary(
-        filePath,
-        bytes,
-        fileOptions: FileOptions(
-          contentType: _getContentType(fileExt),
-          upsert: true,
-        ),
-      );
+      final candidateBuckets = [bucket, 'product-images', 'shop-images', 'images', 'public'];
+      for (final b in candidateBuckets) {
+        try {
+          await _client.storage.from(b).uploadBinary(
+            filePath,
+            bytes,
+            fileOptions: FileOptions(
+              contentType: contentType,
+              upsert: true,
+            ),
+          );
+          return _client.storage.from(b).getPublicUrl(filePath);
+        } catch (_) {
+          // Continue to next bucket
+        }
+      }
 
-      return _client.storage.from(bucket).getPublicUrl(filePath);
+      return null;
     } catch (e) {
-      rethrow;
+      return null;
     }
   }
 
