@@ -13,7 +13,6 @@ import {
   BarChart3,
   LogOut,
   ShieldCheck,
-  Sparkles,
   X,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
@@ -74,22 +73,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div
+          <img
+            src="/yummy_logo.png"
+            alt="YUMMY Logo"
             style={{
               width: 38,
               height: 38,
               borderRadius: 'var(--radius-md)',
-              background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              boxShadow: '0 4px 12px rgba(5, 150, 105, 0.4)',
+              objectFit: 'contain',
               flexShrink: 0,
+              boxShadow: '0 4px 12px rgba(21, 101, 192, 0.4)',
             }}
-          >
-            <Sparkles size={20} />
-          </div>
+          />
           <div>
             <h2
               style={{

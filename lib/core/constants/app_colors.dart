@@ -12,6 +12,8 @@ class AppColors {
   static const Color secondary = Color(0xFF2E7D32); // Fresh green (open status / success)
   static const Color secondaryLight = Color(0xFFE8F5E9);
   static const Color accent = Color(0xFF1565C0);
+  static const Color accentOrange = Color(0xFFFF9800);
+  static const Color accentOrangeLight = Color(0xFFFFF3E0);
 
   // Status & Alerts (Updated with friendly feedback theme)
   static const Color success = Color(0xFF16A34A);

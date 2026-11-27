@@ -174,7 +174,7 @@ class _CustomerOrdersScreenState extends ConsumerState<CustomerOrdersScreen> wit
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        CurrencyFormatter.formatLKR(order.totalAmount),
+                        CurrencyFormatter.format(order.totalAmount),
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary),
                       ),
                       if (isActive)

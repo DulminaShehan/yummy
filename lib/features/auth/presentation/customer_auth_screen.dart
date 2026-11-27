@@ -280,26 +280,64 @@ class _CustomerAuthScreenState extends ConsumerState<CustomerAuthScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Top Hero Illustration Banner (Sky, Rider with BuyLanka Box, Skyline, Lotus Tower, Logo)
-              Stack(
-                children: [
-                  AspectRatio(
-                    aspectRatio: 494 / 316,
-                    child: Image.asset(
-                      'assets/images/auth_header.png',
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
+              // Modern Global Brand Header
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(24, 48, 24, 28),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFE3F2FD), Color(0xFFF5F9FF)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
-                  const Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Opacity(
-                      opacity: 0.0,
-                      child: Text('YUMMY'),
+                ),
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/images/yummy_logo.png',
+                      height: 52,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Y',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    Text(
+                      'YUMMY',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.primary,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Food. Delivered.',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
               // Main Form Container

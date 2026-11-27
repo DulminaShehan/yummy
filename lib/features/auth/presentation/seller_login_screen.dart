@@ -508,7 +508,7 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
             ),
             const Spacer(),
 
-            // BuyLanka Brand Logo Badge
+            // YUMMY Brand Logo Badge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               decoration: BoxDecoration(
@@ -536,7 +536,7 @@ class _SellerLoginScreenState extends ConsumerState<SellerLoginScreen> {
                     ),
                     padding: const EdgeInsets.all(2),
                     child: Image.asset(
-                      'assets/images/buylanka_icon_foreground.png',
+                      'assets/images/yummy_icon.png',
                       fit: BoxFit.contain,
                     ),
                   ),

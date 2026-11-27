@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:buylanka/core/constants/app_colors.dart';
 
-/// Official BuyLanka Splash Screen matching the branded mobile startup design.
+/// Official YUMMY Splash Screen matching modern international startup design.
 ///
 /// Features:
-/// - Branded background (#F5F9FF)
-/// - Top & bottom subtle blue decorative wave elements
-/// - Centered official BuyLanka logo, wordmark, and Sri Lankan tagline
-/// - Minimal blue circular loading indicator
+/// - Brand background (#F5F9FF)
+/// - Top & bottom subtle decorative blue elements
+/// - Centered official YUMMY logo & modern typography tagline
+/// - Minimal brand-colored circular loading indicator
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
@@ -65,29 +66,86 @@ class SplashScreen extends StatelessWidget {
                 child: SingleChildScrollView(
                   physics: const NeverScrollableScrollPhysics(),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // BuyLanka Brand Logo with Symbol, Wordmark & Tagline
+                        // YUMMY Brand Logo with Icon & Wordmark
                         Image.asset(
-                          'assets/images/buylanka_logo.png',
-                          width: 270,
+                          'assets/images/yummy_logo.png',
+                          width: 240,
                           fit: BoxFit.contain,
                           filterQuality: FilterQuality.high,
+                          errorBuilder: (context, error, stackTrace) => Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [AppColors.primary, AppColors.primaryDark],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(22),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.primary.withValues(alpha: 0.35),
+                                      blurRadius: 18,
+                                      offset: const Offset(0, 8),
+                                    ),
+                                  ],
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'Y',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 44,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'YUMMY',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.primary,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        // Global Brand Tagline
+                        Text(
+                          'Food. Delivered.',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                            letterSpacing: 0.8,
+                          ),
                         ),
 
                         const SizedBox(height: 48),
 
                         // Subtle Minimal Blue Circular Loading Indicator
                         SizedBox(
-                          width: 34,
-                          height: 34,
+                          width: 32,
+                          height: 32,
                           child: CircularProgressIndicator(
-                            strokeWidth: 3.0,
+                            strokeWidth: 2.8,
                             valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                            backgroundColor: AppColors.primaryLight.withValues(alpha: 0.6),
+                            backgroundColor: AppColors.primaryLight,
                           ),
                         ),
                       ],
@@ -102,4 +160,3 @@ class SplashScreen extends StatelessWidget {
     );
   }
 }
-

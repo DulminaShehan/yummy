@@ -125,7 +125,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('Place Order', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        Text(CurrencyFormatter.formatLKR(cart.totalAmount), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                        Text(CurrencyFormatter.format(cart.totalAmount), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                       ],
                     ),
             ),
@@ -302,7 +302,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                   ),
                   Text(
-                    CurrencyFormatter.formatLKR(item.totalPrice),
+                    CurrencyFormatter.format(item.totalPrice),
                     style: const TextStyle(fontSize: 13, color: AppColors.textLight),
                   ),
                 ],
@@ -314,7 +314,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Item Subtotal', style: TextStyle(color: AppColors.textLight, fontSize: 13)),
-              Text(CurrencyFormatter.formatLKR(cart.subtotal), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              Text(CurrencyFormatter.format(cart.subtotal), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
             ],
           ),
           const SizedBox(height: 6),
@@ -322,7 +322,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Delivery Fee', style: TextStyle(color: AppColors.textLight, fontSize: 13)),
-              Text(CurrencyFormatter.formatLKR(cart.deliveryFee), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              Text(CurrencyFormatter.format(cart.deliveryFee), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
             ],
           ),
           const Divider(height: 20),
@@ -331,7 +331,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             children: [
               const Text('Total Amount', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
               Text(
-                CurrencyFormatter.formatLKR(cart.totalAmount),
+                CurrencyFormatter.format(cart.totalAmount),
                 style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppColors.primary),
               ),
             ],

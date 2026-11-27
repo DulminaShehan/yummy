@@ -299,7 +299,7 @@ class _CustomerHomeScreenState extends ConsumerState<CustomerHomeScreen> {
                     ),
                     padding: const EdgeInsets.all(4),
                     child: Image.asset(
-                      'assets/images/buylanka_icon_foreground.png',
+                      'assets/images/yummy_icon.png',
                       fit: BoxFit.contain,
                     ),
                   ),

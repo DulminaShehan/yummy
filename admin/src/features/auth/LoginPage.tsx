@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Sparkles, Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react'
+import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { Input } from '../../components/ui/Input'
@@ -60,22 +60,18 @@ export const LoginPage: React.FC = () => {
       >
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div
+          <img
+            src="/yummy_logo.png"
+            alt="YUMMY Logo"
             style={{
-              width: 54,
-              height: 54,
+              width: 68,
+              height: 68,
               borderRadius: 'var(--radius-lg)',
-              background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
+              objectFit: 'contain',
               marginBottom: '1rem',
-              boxShadow: '0 8px 20px rgba(5, 150, 105, 0.35)',
+              boxShadow: '0 8px 24px rgba(21, 101, 192, 0.35)',
             }}
-          >
-            <Sparkles size={28} />
-          </div>
+          />
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
             YUMMY Admin
           </h1>
