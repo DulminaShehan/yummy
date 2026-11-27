@@ -1,4 +1,5 @@
 // ignore_for_file: use_null_aware_elements
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:buylanka/core/constants/supabase_constants.dart';
 import 'package:buylanka/models/profile_model.dart';
@@ -584,6 +585,47 @@ class AuthRepository {
     } catch (e) {
       return null;
     }
+  }
+
+  /// Sign in with Social OAuth provider (Google, Facebook)
+  Future<bool> signInWithOAuth(OAuthProvider provider) async {
+    return await _client.auth.signInWithOAuth(
+      provider,
+      redirectTo: kIsWeb ? null : 'yummy://login-callback',
+      authScreenLaunchMode: kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication,
+    );
+  }
+
+  /// Ensure customer profile exists and is assigned role 'customer' upon OAuth return
+  Future<ProfileModel?> handleOAuthCallback() async {
+    final user = currentUser;
+    if (user == null) return null;
+
+    final existing = await getProfile(user.id);
+    if (existing != null) return existing;
+
+    final meta = user.userMetadata ?? {};
+    final fullName = (meta['full_name'] as String?) ??
+        (meta['name'] as String?) ??
+        user.email?.split('@').first ??
+        'YUMMY Foodie';
+    final avatarUrl = (meta['avatar_url'] as String?) ??
+        (meta['picture'] as String?);
+
+    try {
+      await _client.from(SupabaseConstants.profilesTable).upsert({
+        'id': user.id,
+        'full_name': fullName,
+        'email': user.email ?? '',
+        'avatar_url': avatarUrl,
+        'role': 'customer',
+        'status': 'active',
+        'created_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
+      });
+    } catch (_) {}
+
+    return await getProfile(user.id);
   }
 
   /// Send password reset email

@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MapUtils {
@@ -64,5 +65,25 @@ class MapUtils {
       debugPrint('Error launching phone call: $e');
     }
     return false;
+  }
+
+  /// Interpolate a realistic road path between start and end coordinates
+  static List<LatLng> generateCurvedRoutePoints(LatLng start, LatLng end) {
+    final startLat = start.latitude;
+    final startLng = start.longitude;
+    final endLat = end.latitude;
+    final endLng = end.longitude;
+
+    final midLat = (startLat + endLat) / 2;
+    final midLng = (startLng + endLng) / 2;
+
+    // Perpendicular offset to simulate road turning
+    final dLat = endLat - startLat;
+    final dLng = endLng - startLng;
+    final offsetLat = -dLng * 0.12;
+    final offsetLng = dLat * 0.12;
+
+    final midPoint = LatLng(midLat + offsetLat, midLng + offsetLng);
+    return [start, midPoint, end];
   }
 }

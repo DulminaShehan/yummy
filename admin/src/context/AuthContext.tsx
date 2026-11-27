@@ -7,6 +7,7 @@ interface AuthContextType {
   user: Profile | null
   isAuthenticated: boolean
   isAdmin: boolean
+  isSeller: boolean
   isLoading: boolean
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
   signUp: (email: string, password: string, fullName?: string) => Promise<{ success: boolean; error?: string }>
@@ -78,6 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         isAuthenticated: Boolean(user),
         isAdmin: user?.role === 'admin',
+        isSeller: user?.role === 'seller' || user?.role === 'admin',
         isLoading,
         signIn,
         signUp,

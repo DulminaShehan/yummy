@@ -46,20 +46,20 @@ final activeDeliveryMapProvider = Provider.autoDispose.family<ActiveDeliveryMapS
 
   if (delivery == null) return null;
 
-  // 1. Determine Rider Location (fallback to Colombo Fort if GPS is initializing)
-  final riderLat = dashboardState.currentPosition?.latitude ?? 6.9319;
-  final riderLng = dashboardState.currentPosition?.longitude ?? 79.8478;
+  // 1. Determine Rider Location with dynamic fallback
+  final riderLat = dashboardState.currentPosition?.latitude ?? (delivery.pickupLatitude ?? 37.7749);
+  final riderLng = dashboardState.currentPosition?.longitude ?? (delivery.pickupLongitude ?? -122.4194);
   final riderLocation = LatLng(riderLat, riderLng);
 
   // 2. Determine Destination based on Delivery Stage
   final isHeadingToShop = delivery.isBeforePickup;
 
   final destLat = isHeadingToShop
-      ? (delivery.pickupLatitude ?? 6.9271)
-      : (delivery.dropoffLatitude ?? 6.8905);
+      ? (delivery.pickupLatitude ?? riderLat)
+      : (delivery.dropoffLatitude ?? riderLat);
   final destLng = isHeadingToShop
-      ? (delivery.pickupLongitude ?? 79.8612)
-      : (delivery.dropoffLongitude ?? 79.8732);
+      ? (delivery.pickupLongitude ?? riderLng)
+      : (delivery.dropoffLongitude ?? riderLng);
   final destinationLocation = LatLng(destLat, destLng);
 
   final destinationName = isHeadingToShop

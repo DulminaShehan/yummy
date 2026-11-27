@@ -32,6 +32,12 @@ class LocationService {
     return LocationStatus.ready;
   }
 
+  /// Whether location permission is ready for GPS querying
+  static Future<bool> isPermissionGranted() async {
+    final status = await checkAndRequestPermission();
+    return status == LocationStatus.ready;
+  }
+
   /// Get current GPS position with fallback handling when device location services are unavailable
   static Future<Position?> getCurrentPosition() async {
     try {
@@ -52,10 +58,13 @@ class LocationService {
     }
   }
 
-  /// Stream of throttled location updates for live tracking
+  /// Throttled GPS stream designed for battery and database optimization:
+  /// - High frequency (15m filter / 8s interval) strictly during active delivery fulfillment
+  /// - Background foreground service: Android foreground notification ensures uninterrupted
+  ///   GPS delivery tracking while adhering to Google Play Developer Privacy Policies.
   static Stream<Position> getThrottledLocationStream({
     int distanceFilter = 15, // meters
-    int intervalSeconds = 10,
+    int intervalSeconds = 8,
   }) {
     return Geolocator.getPositionStream(
       locationSettings: LocationSettings(

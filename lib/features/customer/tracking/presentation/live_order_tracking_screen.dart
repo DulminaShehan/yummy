@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:buylanka/core/constants/app_colors.dart';
 import 'package:buylanka/core/location/map_utils.dart';
 import 'package:buylanka/core/utils/currency_formatter.dart';
@@ -48,11 +49,12 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
       appBar: AppBar(
         title: Text('Order #${order.orderNumber}', style: const TextStyle(fontWeight: FontWeight.bold)),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.support_agent_rounded, color: AppColors.primary),
-            tooltip: 'Support Hotline',
-            onPressed: () => MapUtils.makePhoneCall('+94 11 200 9000'),
-          ),
+          if (shop?.contactPhone?.isNotEmpty == true)
+            IconButton(
+              icon: const Icon(Icons.support_agent_rounded, color: AppColors.primary),
+              tooltip: 'Contact Restaurant Support',
+              onPressed: () => MapUtils.makePhoneCall(shop!.contactPhone!),
+            ),
         ],
       ),
       body: Column(
@@ -66,14 +68,14 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
                   mapController: _mapController,
                   options: MapOptions(
                     initialCenter: riderPos ?? state.shopLocation,
-                    initialZoom: 13.5,
+                    initialZoom: 14.0,
                     minZoom: 6.0,
                     maxZoom: 18.0,
                   ),
                   children: [
                     TileLayer(
                       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.buylanka.app',
+                      userAgentPackageName: 'com.yummy.app',
                     ),
                     if (state.routePoints.isNotEmpty)
                       PolylineLayer(
@@ -92,8 +94,8 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
                         // Restaurant Marker
                         Marker(
                           point: state.shopLocation,
-                          width: 36,
-                          height: 36,
+                          width: 38,
+                          height: 38,
                           child: Container(
                             decoration: BoxDecoration(
                               color: AppColors.primary,
@@ -108,8 +110,8 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
                         // Customer Destination Marker
                         Marker(
                           point: state.customerLocation,
-                          width: 36,
-                          height: 36,
+                          width: 38,
+                          height: 38,
                           child: Container(
                             decoration: BoxDecoration(
                               color: AppColors.secondary,
@@ -125,18 +127,22 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
                         if (riderPos != null)
                           Marker(
                             point: riderPos,
-                            width: 44,
-                            height: 44,
+                            width: 48,
+                            height: 48,
                             child: Container(
                               decoration: BoxDecoration(
                                 color: AppColors.info,
                                 shape: BoxShape.circle,
                                 border: Border.all(color: Colors.white, width: 3),
                                 boxShadow: [
-                                  BoxShadow(color: AppColors.info.withValues(alpha: 0.4), blurRadius: 10, spreadRadius: 2),
+                                  BoxShadow(
+                                    color: AppColors.info.withValues(alpha: 0.45),
+                                    blurRadius: 10,
+                                    spreadRadius: 2,
+                                  ),
                                 ],
                               ),
-                              child: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 24),
+                              child: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 26),
                             ),
                           ),
                       ],
@@ -144,26 +150,27 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
                   ],
                 ),
 
-                // ETA Pill Overlay
+                // ETA & Distance Pill Overlay
                 Positioned(
-                  top: 12,
+                  top: 14,
                   left: 16,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.8),
+                      color: Colors.black.withValues(alpha: 0.85),
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8)],
                     ),
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(Icons.timer_outlined, color: AppColors.secondary, size: 16),
                         const SizedBox(width: 6),
                         Text(
                           order.orderStatus == 'delivered'
                               ? 'Delivered'
-                              : '~${state.estimatedMinutes} min estimated',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                              : '~${state.estimatedMinutes} mins • ${state.distanceKm.toStringAsFixed(1)} km',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
                         ),
                       ],
                     ),
@@ -172,7 +179,7 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
 
                 // Recenter Button
                 Positioned(
-                  bottom: 12,
+                  bottom: 14,
                   right: 16,
                   child: FloatingActionButton.small(
                     heroTag: 'customer_recenter',
@@ -188,7 +195,7 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
             ),
           ),
 
-          // 2. Order Status Stepper & Details Sheet
+          // 2. Order Status Stepper & Rider Card
           Expanded(
             flex: 6,
             child: Container(
@@ -211,7 +218,7 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              '${order.items.length} items • ${CurrencyFormatter.formatLKR(order.totalAmount)}',
+                              '${order.items.length} items • ${CurrencyFormatter.format(order.totalAmount)}',
                               style: const TextStyle(fontSize: 13, color: AppColors.textLight),
                             ),
                           ],
@@ -234,44 +241,10 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
 
                     const Divider(height: 24),
 
-                    // Rider info pill (if assigned)
-                    if (delivery != null && delivery.isAssigned) ...[
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Row(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: AppColors.primary,
-                                  radius: 18,
-                                  child: Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 20),
-                                ),
-                                SizedBox(width: 12),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Delivery Rider Assigned', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                    SizedBox(height: 2),
-                                    Text('Contact driver for updates', style: TextStyle(fontSize: 11, color: AppColors.textLight)),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.call_rounded, color: AppColors.success),
-                              onPressed: () => MapUtils.makePhoneCall('+94 77 123 4567'),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                    // Professional Rider Card (when assigned)
+                    if (delivery != null && (delivery.rider != null || delivery.isAssigned || delivery.isActive)) ...[
+                      _buildRiderCard(delivery),
+                      const SizedBox(height: 18),
                     ],
 
                     // Order Progress Stepper
@@ -281,6 +254,96 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRiderCard(dynamic delivery) {
+    final rider = delivery.rider;
+    final profile = rider?.profile;
+    final riderName = profile?.fullName ?? 'Delivery Partner';
+    final riderPhone = profile?.phoneNumber ?? delivery.customerContactPhone ?? '';
+    final vehicle = rider != null
+        ? '${rider.vehicleType.toUpperCase()} • ${rider.vehicleModel ?? ''} (${rider.vehicleNumber})'
+        : 'Assigned Driver';
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Rider Avatar / Photo
+          ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              width: 48,
+              height: 48,
+              color: AppColors.primaryLight,
+              child: profile?.avatarUrl?.isNotEmpty == true
+                  ? Image.network(
+                      profile!.avatarUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.two_wheeler_rounded, color: AppColors.primary, size: 24),
+                    )
+                  : const Icon(Icons.two_wheeler_rounded, color: AppColors.primary, size: 24),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Rider & Vehicle Information
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        riderName,
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppColors.textPrimary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.verified_rounded, size: 16, color: AppColors.primary),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  vehicle,
+                  style: const TextStyle(fontSize: 11.5, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          // Call Rider Button
+          if (riderPhone.isNotEmpty)
+            Material(
+              color: AppColors.successBg,
+              borderRadius: BorderRadius.circular(12),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => MapUtils.makePhoneCall(riderPhone),
+                child: const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Icon(Icons.call_rounded, color: AppColors.success, size: 20),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -297,8 +360,11 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Delivery Milestones', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-        const SizedBox(height: 12),
+        Text(
+          'Delivery Milestones',
+          style: GoogleFonts.plusJakartaSans(fontSize: 14.5, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+        ),
+        const SizedBox(height: 14),
         _buildTimelineStep(
           title: 'Order Placed & Sent',
           subtitle: 'Restaurant has received your order',
@@ -307,19 +373,19 @@ class _LiveOrderTrackingScreenState extends ConsumerState<LiveOrderTrackingScree
         ),
         _buildTimelineStep(
           title: 'Food in Preparation 👨‍🍳',
-          subtitle: 'Kitchen is packing your fresh meal',
+          subtitle: 'Kitchen is cooking and packing your meal',
           isDone: isPreparing,
           isActive: status == 'preparing' || status == 'accepted',
         ),
         _buildTimelineStep(
-          title: 'Rider Picked Up & On The Way 🚴',
-          subtitle: 'Heading towards your delivery destination',
+          title: 'Rider Heading to Destination 🚴',
+          subtitle: isOnTheWay ? 'Food picked up • On the way to you' : 'Rider assigned • Heading to restaurant',
           isDone: isReadyOrPicked,
-          isActive: isOnTheWay,
+          isActive: isOnTheWay || status == 'going_to_pickup',
         ),
         _buildTimelineStep(
           title: 'Order Delivered 🎉',
-          subtitle: 'Enjoy your food!',
+          subtitle: 'Enjoy your delicious food!',
           isDone: isDelivered,
           isActive: isDelivered,
           isLast: true,

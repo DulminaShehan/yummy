@@ -1,0 +1,14 @@
+{
+  "name": "yummy-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "YUMMY – Global Food Delivery & Restaurant Partner Platform",
+  "scripts": {
+    "dev": "npm --prefix customer-web run dev",
+    "dev:customer": "npm --prefix customer-web run dev",
+    "dev:admin": "npm --prefix admin run dev",
+    "build:customer": "npm --prefix customer-web run build",
+    "build:admin": "npm --prefix admin run build",
+    "build:all": "npm run build:customer && npm run build:admin"
+  }
+}

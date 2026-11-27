@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:buylanka/core/constants/app_colors.dart';
 import 'package:buylanka/core/widgets/auth_feedback_banner.dart';
 import 'package:buylanka/features/auth/controllers/auth_controller.dart';
@@ -501,6 +502,11 @@ class _CustomerAuthScreenState extends ConsumerState<CustomerAuthScreen> {
                     else
                       _buildRegisterForm(authState.isLoading),
 
+                    const SizedBox(height: 18),
+
+                    // Social Sign-In (Google & Facebook)
+                    _buildSocialAuthButtons(authState.isLoading),
+
                     const SizedBox(height: 20),
 
                     // Divider: --- OR ---
@@ -605,6 +611,134 @@ class _CustomerAuthScreenState extends ConsumerState<CustomerAuthScreen> {
   }
 
   // ===================== SIGN IN FORM =====================
+  Widget _buildSocialAuthButtons(bool isLoading) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: InkWell(
+                onTap: isLoading
+                    ? null
+                    : () {
+                        ref
+                            .read(authControllerProvider.notifier)
+                            .signInWithOAuth(OAuthProvider.google);
+                      },
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x08000000),
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 22,
+                        height: 22,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            'G',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: const Color(0xFF4285F4),
+                              fontWeight: FontWeight.w900,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Google',
+                        style: GoogleFonts.plusJakartaSans(
+                          color: const Color(0xFF1E293B),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: InkWell(
+                onTap: isLoading
+                    ? null
+                    : () {
+                        ref
+                            .read(authControllerProvider.notifier)
+                            .signInWithOAuth(OAuthProvider.facebook);
+                      },
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1877F2),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x201877F2),
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'f',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: const Color(0xFF1877F2),
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Facebook',
+                        style: GoogleFonts.plusJakartaSans(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildSignInForm(bool isLoading) {
     return Form(
       key: _signInFormKey,

@@ -35,7 +35,7 @@ class LiveTrackingState {
 
   bool get isRiderAssigned => delivery != null && delivery!.isAssigned;
   bool get isPickedUp => delivery != null && delivery!.isAfterPickup;
-  bool get isDelivered => order?.orderStatus == 'delivered';
+  bool get isDelivered => order?.orderStatus == 'delivered' || (delivery != null && delivery!.isDelivered);
 
   LiveTrackingState copyWith({
     OrderModel? order,
@@ -66,39 +66,42 @@ class LiveTrackingState {
 
 class LiveTrackingController extends StateNotifier<LiveTrackingState> {
   final String orderId;
-  final CustomerOrderRepository _orderRepo;
+  final CustomerOrderRepository orderRepo;
   StreamSubscription? _orderSub;
   StreamSubscription? _deliverySub;
   StreamSubscription? _riderLocSub;
 
   LiveTrackingController({
     required this.orderId,
-    required CustomerOrderRepository orderRepo,
-  })  : _orderRepo = orderRepo, // ignore: prefer_initializing_formals
-        super(const LiveTrackingState(
-          shopLocation: LatLng(6.9271, 79.8612), // Colombo Default
-          customerLocation: LatLng(6.8905, 79.8732),
+    required this.orderRepo,
+  })  : super(const LiveTrackingState(
+          shopLocation: LatLng(37.7749, -122.4194), // Dynamic fallback
+          customerLocation: LatLng(37.7833, -122.4167),
           isLoading: true,
         )) {
     _initTracking();
   }
 
   Future<void> _initTracking() async {
-    final order = await _orderRepo.getOrderById(orderId);
+    final order = await orderRepo.getOrderById(orderId);
     if (order != null) {
       _updateWithOrder(order);
     }
 
     // 1. Subscribe to order status changes
-    _orderSub = _orderRepo.streamOrder(orderId).listen((records) {
+    _orderSub = orderRepo.streamOrder(orderId).listen((records) {
       if (records.isNotEmpty) {
         final updated = OrderModel.fromJson(records.first);
         _updateWithOrder(updated);
+        // Automatically terminate tracking if delivered
+        if (updated.orderStatus == 'delivered' || updated.orderStatus == 'cancelled') {
+          _stopTrackingSubscriptions();
+        }
       }
     });
 
     // 2. Subscribe to delivery record
-    _deliverySub = _orderRepo.streamDelivery(orderId).listen((deliveries) {
+    _deliverySub = orderRepo.streamDelivery(orderId).listen((deliveries) {
       if (deliveries.isNotEmpty) {
         final delivery = DeliveryModel.fromJson(deliveries.first);
         _updateWithDelivery(delivery);
@@ -111,10 +114,10 @@ class LiveTrackingController extends StateNotifier<LiveTrackingState> {
   }
 
   void _updateWithDelivery(DeliveryModel delivery) {
-    final shopLat = delivery.pickupLatitude ?? 6.9271;
-    final shopLng = delivery.pickupLongitude ?? 79.8612;
-    final custLat = delivery.dropoffLatitude ?? 6.8905;
-    final custLng = delivery.dropoffLongitude ?? 79.8732;
+    final shopLat = delivery.pickupLatitude ?? state.shopLocation.latitude;
+    final shopLng = delivery.pickupLongitude ?? state.shopLocation.longitude;
+    final custLat = delivery.dropoffLatitude ?? state.customerLocation.latitude;
+    final custLng = delivery.dropoffLongitude ?? state.customerLocation.longitude;
 
     final shopLoc = LatLng(shopLat, shopLng);
     final custLoc = LatLng(custLat, custLng);
@@ -125,10 +128,16 @@ class LiveTrackingController extends StateNotifier<LiveTrackingState> {
       customerLocation: custLoc,
     );
 
+    // Stop tracking if delivery has finished
+    if (delivery.isDelivered || delivery.isCancelled) {
+      _stopTrackingSubscriptions();
+      return;
+    }
+
     // Subscribe to live GPS breadcrumbs for rider
-    if (delivery.id.isNotEmpty) {
+    if (delivery.id.isNotEmpty && !delivery.isDelivered) {
       _riderLocSub?.cancel();
-      _riderLocSub = _orderRepo.streamRiderLocation(delivery.id).listen((locations) {
+      _riderLocSub = orderRepo.streamRiderLocation(delivery.id).listen((locations) {
         if (locations.isNotEmpty) {
           final loc = RiderLocationModel.fromJson(locations.first);
           final riderPos = LatLng(loc.latitude, loc.longitude);
@@ -147,7 +156,7 @@ class LiveTrackingController extends StateNotifier<LiveTrackingState> {
       });
     }
 
-    // Default route polyline
+    // Default route polyline before rider position is received
     if (state.liveRiderPosition == null) {
       final dist = MapUtils.calculateDistanceKm(shopLat, shopLng, custLat, custLng);
       state = state.copyWith(
@@ -158,11 +167,16 @@ class LiveTrackingController extends StateNotifier<LiveTrackingState> {
     }
   }
 
+  void _stopTrackingSubscriptions() {
+    _riderLocSub?.cancel();
+    _riderLocSub = null;
+  }
+
   @override
   void dispose() {
     _orderSub?.cancel();
     _deliverySub?.cancel();
-    _riderLocSub?.cancel();
+    _stopTrackingSubscriptions();
     super.dispose();
   }
 }

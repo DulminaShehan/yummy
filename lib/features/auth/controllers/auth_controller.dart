@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:buylanka/core/errors/auth_error_handler.dart';
 import 'package:buylanka/models/profile_model.dart';
 import 'package:buylanka/models/rider_model.dart';
@@ -436,6 +437,46 @@ class AuthController extends StateNotifier<AuthStateData> {
         errorMessage: AuthErrorHandler.handle(e, stackTrace: stackTrace, context: 'Password Reset'),
       );
       return false;
+    }
+  }
+
+  /// Sign in with Social OAuth provider (Google, Facebook)
+  Future<bool> signInWithOAuth(OAuthProvider provider) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final initiated = await _authRepository.signInWithOAuth(provider);
+      if (!initiated) {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Social sign-in was cancelled or could not be initiated.',
+        );
+        return false;
+      }
+      return true;
+    } catch (e, stackTrace) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: AuthErrorHandler.handle(e, stackTrace: stackTrace, context: 'Social Sign In'),
+      );
+      return false;
+    }
+  }
+
+  /// Handle OAuth callback and ensure customer profile is hydrated
+  Future<void> handleOAuthCallback() async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final profile = await _authRepository.handleOAuthCallback();
+      if (profile != null) {
+        state = state.copyWith(profile: profile, isLoading: false, clearError: true);
+      } else {
+        state = state.copyWith(isLoading: false);
+      }
+    } catch (e, stackTrace) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: AuthErrorHandler.handle(e, stackTrace: stackTrace, context: 'OAuth Callback'),
+      );
     }
   }
 
