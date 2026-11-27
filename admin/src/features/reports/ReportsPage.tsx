@@ -30,13 +30,13 @@ export const ReportsPage: React.FC = () => {
 
   const handleExportVendors = () => {
     if (!report?.topSellingVendors) return
-    reportsService.exportToCSV(report.topSellingVendors, 'BuyLanka_Vendor_Performance')
+    reportsService.exportToCSV(report.topSellingVendors, 'YUMMY_Vendor_Performance')
     success('Vendor performance report exported to CSV')
   }
 
   const handleExportCategories = () => {
     if (!report?.topCategories) return
-    reportsService.exportToCSV(report.topCategories, 'BuyLanka_Category_Performance')
+    reportsService.exportToCSV(report.topCategories, 'YUMMY_Category_Performance')
     success('Category performance report exported to CSV')
   }
 
@@ -141,7 +141,7 @@ export const ReportsPage: React.FC = () => {
                 <tr>
                   <th>Category</th>
                   <th>Units Sold</th>
-                  <th>Gross Revenue (LKR)</th>
+                  <th>Gross Revenue</th>
                 </tr>
               </thead>
               <tbody>

@@ -162,7 +162,7 @@ class _CustomerOrderDetailsScreenState extends ConsumerState<CustomerOrderDetail
                             ],
                           ),
                           Text(
-                            CurrencyFormatter.formatLKR(item.totalPrice),
+                            CurrencyFormatter.format(item.totalPrice),
                             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                           ),
                         ],
@@ -174,7 +174,7 @@ class _CustomerOrderDetailsScreenState extends ConsumerState<CustomerOrderDetail
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Delivery Fee', style: TextStyle(color: AppColors.textLight, fontSize: 13)),
-                      Text(CurrencyFormatter.formatLKR(order.deliveryFee), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                      Text(CurrencyFormatter.format(order.deliveryFee), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                     ],
                   ),
                   if (order.discountAmount > 0) ...[
@@ -183,7 +183,7 @@ class _CustomerOrderDetailsScreenState extends ConsumerState<CustomerOrderDetail
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('Discount', style: TextStyle(color: AppColors.success, fontSize: 13)),
-                        Text('- ${CurrencyFormatter.formatLKR(order.discountAmount)}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.success, fontSize: 13)),
+                        Text('- ${CurrencyFormatter.format(order.discountAmount)}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.success, fontSize: 13)),
                       ],
                     ),
                   ],
@@ -193,7 +193,7 @@ class _CustomerOrderDetailsScreenState extends ConsumerState<CustomerOrderDetail
                     children: [
                       const Text('Total Paid (COD)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
                       Text(
-                        CurrencyFormatter.formatLKR(order.totalAmount),
+                        CurrencyFormatter.format(order.totalAmount),
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary),
                       ),
                     ],

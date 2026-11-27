@@ -95,7 +95,7 @@ class _CustomerOrdersScreenState extends ConsumerState<CustomerOrdersScreen> wit
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: orders.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 14),
+      separatorBuilder: (_, _) => const SizedBox(height: 14),
       itemBuilder: (context, index) {
         final order = orders[index];
         final shop = order.shop;
@@ -174,7 +174,7 @@ class _CustomerOrdersScreenState extends ConsumerState<CustomerOrdersScreen> wit
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        CurrencyFormatter.formatLKR(order.totalAmount),
+                        CurrencyFormatter.format(order.totalAmount),
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary),
                       ),
                       if (isActive)

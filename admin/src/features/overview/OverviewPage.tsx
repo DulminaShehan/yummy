@@ -275,7 +275,7 @@ export const OverviewPage: React.FC = () => {
         <div className="card-header">
           <div>
             <h3 className="card-title">Recent Customer Orders</h3>
-            <p className="card-subtitle">Latest transactions placed on the BuyLanka platform</p>
+            <p className="card-subtitle">Latest transactions placed on the YUMMY platform</p>
           </div>
           <Link to="/orders" className="btn btn-secondary btn-sm">
             View All Orders <ArrowRight size={14} />

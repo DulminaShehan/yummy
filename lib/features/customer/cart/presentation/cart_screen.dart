@@ -155,7 +155,7 @@ class CartScreen extends ConsumerWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: cart.items.length,
-                    separatorBuilder: (_, __) => const Divider(height: 20),
+                    separatorBuilder: (_, _) => const Divider(height: 20),
                     itemBuilder: (context, index) {
                       final item = cart.items[index];
                       return Row(
@@ -171,7 +171,7 @@ class CartScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  CurrencyFormatter.formatLKR(item.product.price),
+                                  CurrencyFormatter.format(item.product.price),
                                   style: const TextStyle(fontSize: 13, color: AppColors.textLight),
                                 ),
                                 if (item.specialInstructions != null && item.specialInstructions!.isNotEmpty) ...[
@@ -214,7 +214,7 @@ class CartScreen extends ConsumerWidget {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            CurrencyFormatter.formatLKR(item.totalPrice),
+                            CurrencyFormatter.format(item.totalPrice),
                             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                           ),
                         ],
@@ -244,7 +244,7 @@ class CartScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Item Subtotal', style: TextStyle(color: AppColors.textLight)),
-                      Text(CurrencyFormatter.formatLKR(cart.subtotal), style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text(CurrencyFormatter.format(cart.subtotal), style: const TextStyle(fontWeight: FontWeight.w600)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -252,7 +252,7 @@ class CartScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Delivery Fee', style: TextStyle(color: AppColors.textLight)),
-                      Text(CurrencyFormatter.formatLKR(cart.deliveryFee), style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text(CurrencyFormatter.format(cart.deliveryFee), style: const TextStyle(fontWeight: FontWeight.w600)),
                     ],
                   ),
                   const Divider(height: 20),
@@ -261,7 +261,7 @@ class CartScreen extends ConsumerWidget {
                     children: [
                       const Text('To Pay', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
                       Text(
-                        CurrencyFormatter.formatLKR(cart.totalAmount),
+                        CurrencyFormatter.format(cart.totalAmount),
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary),
                       ),
                     ],
@@ -305,7 +305,7 @@ class CartScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Proceed to Checkout', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text(CurrencyFormatter.formatLKR(cart.totalAmount), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  Text(CurrencyFormatter.format(cart.totalAmount), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),

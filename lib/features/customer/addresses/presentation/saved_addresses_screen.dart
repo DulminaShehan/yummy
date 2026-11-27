@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:buylanka/core/constants/app_colors.dart';
+import 'package:buylanka/core/constants/country_config.dart';
 import 'package:buylanka/features/customer/addresses/controllers/address_controller.dart';
 
 class SavedAddressesScreen extends ConsumerWidget {
@@ -171,10 +172,13 @@ class SavedAddressesScreen extends ConsumerWidget {
   void _showAddAddressDialog(BuildContext context, AddressController controller) {
     final formKey = GlobalKey<FormState>();
     String label = 'Home';
+    CountryConfig selectedCountry = CountryConfig.defaultCountry;
     final nameCtrl = TextEditingController();
     final phoneCtrl = TextEditingController();
     final streetCtrl = TextEditingController();
-    final cityCtrl = TextEditingController(text: 'Colombo');
+    final cityCtrl = TextEditingController();
+    final stateRegionCtrl = TextEditingController();
+    final postalCtrl = TextEditingController();
     final noteCtrl = TextEditingController();
     bool isDefault = false;
 
@@ -209,6 +213,29 @@ class SavedAddressesScreen extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
+
+                  // Country Selection
+                  DropdownButtonFormField<String>(
+                    initialValue: selectedCountry.code,
+                    decoration: InputDecoration(
+                      labelText: 'Country / Market',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      filled: true,
+                      fillColor: AppColors.surface,
+                    ),
+                    items: CountryConfig.supportedCountries.map((c) => DropdownMenuItem(
+                      value: c.code,
+                      child: Text('${c.name} (${c.dialCode})'),
+                    )).toList(),
+                    onChanged: (code) {
+                      if (code != null) {
+                        setModalState(() {
+                          selectedCountry = CountryConfig.findByCode(code);
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 10),
 
                   // Label Selector
                   Row(
@@ -248,6 +275,7 @@ class SavedAddressesScreen extends ConsumerWidget {
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       labelText: 'Contact Phone Number',
+                      hintText: '${selectedCountry.dialCode} 555 123 4567',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       filled: true,
                       fillColor: AppColors.surface,
@@ -260,7 +288,7 @@ class SavedAddressesScreen extends ConsumerWidget {
                     controller: streetCtrl,
                     decoration: InputDecoration(
                       labelText: 'Street Address / Building',
-                      hintText: 'e.g. No. 45, Galle Road, Bambalapitiya',
+                      hintText: 'e.g. 1044 Market Street, Apt 3B',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       filled: true,
                       fillColor: AppColors.surface,
@@ -269,15 +297,46 @@ class SavedAddressesScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 10),
 
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: cityCtrl,
+                          decoration: InputDecoration(
+                            labelText: 'City / Town',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            filled: true,
+                            fillColor: AppColors.surface,
+                          ),
+                          validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          controller: stateRegionCtrl,
+                          decoration: InputDecoration(
+                            labelText: 'State / Region',
+                            hintText: 'e.g. California',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            filled: true,
+                            fillColor: AppColors.surface,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
                   TextFormField(
-                    controller: cityCtrl,
+                    controller: postalCtrl,
                     decoration: InputDecoration(
-                      labelText: 'City / District',
+                      labelText: 'Postal / ZIP Code (Optional)',
+                      hintText: 'e.g. 94103',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       filled: true,
                       fillColor: AppColors.surface,
                     ),
-                    validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
                   ),
                   const SizedBox(height: 10),
 
@@ -285,7 +344,7 @@ class SavedAddressesScreen extends ConsumerWidget {
                     controller: noteCtrl,
                     decoration: InputDecoration(
                       labelText: 'Delivery Instructions (Optional)',
-                      hintText: 'e.g. 2nd Floor, Apt 3B',
+                      hintText: 'e.g. Ring front doorbell or leave with concierge',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       filled: true,
                       fillColor: AppColors.surface,
@@ -308,12 +367,23 @@ class SavedAddressesScreen extends ConsumerWidget {
                     child: ElevatedButton(
                       onPressed: () async {
                         if (formKey.currentState?.validate() ?? false) {
+                          final combinedDistrict = [
+                            if (stateRegionCtrl.text.trim().isNotEmpty) stateRegionCtrl.text.trim(),
+                            if (postalCtrl.text.trim().isNotEmpty) postalCtrl.text.trim(),
+                            selectedCountry.name,
+                          ].join(', ');
+
+                          final finalPhone = phoneCtrl.text.trim().startsWith('+')
+                              ? phoneCtrl.text.trim()
+                              : '${selectedCountry.dialCode} ${phoneCtrl.text.trim()}';
+
                           await controller.createAddress(
                             label: label,
                             recipientName: nameCtrl.text.trim(),
-                            phoneNumber: phoneCtrl.text.trim(),
+                            phoneNumber: finalPhone,
                             streetAddress: streetCtrl.text.trim(),
                             city: cityCtrl.text.trim(),
+                            district: combinedDistrict,
                             deliveryInstructions: noteCtrl.text.trim().isEmpty ? null : noteCtrl.text.trim(),
                             isDefault: isDefault,
                           );

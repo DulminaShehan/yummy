@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:buylanka/core/constants/supabase_constants.dart';
 import 'package:buylanka/models/category_model.dart';
@@ -49,72 +50,126 @@ class ProductRepository {
 
   /// Create a new product / food menu item
   Future<ProductModel> createProduct(ProductModel product) async {
-    final slug = product.title
+    var cleanSlug = product.title
         .toLowerCase()
         .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
         .replaceAll(RegExp(r'^-|-$'), '');
+    if (cleanSlug.isEmpty) {
+      cleanSlug = 'dish';
+    }
+    final uniqueSlug = '$cleanSlug-${DateTime.now().millisecondsSinceEpoch}';
 
-    final payload = {
+    final payload = <String, dynamic>{
       'shop_id': product.shopId,
-      'category_id': product.categoryId,
       'title': product.title.trim(),
-      'slug': '$slug-${DateTime.now().millisecondsSinceEpoch % 100000}',
-      'description': product.description?.trim(),
+      'slug': uniqueSlug,
       'price': product.price,
-      'original_price': product.originalPrice,
       'stock_quantity': product.stockQuantity,
-      'sku': product.sku?.trim(),
       'images': product.images,
       'status': product.isAvailable ? 'published' : 'draft',
       'is_featured': product.isFeatured,
-      'is_available': product.isAvailable,
-      'preparation_time_minutes': product.preparationTimeMinutes,
     };
 
-    final data = await _client
-        .from(SupabaseConstants.productsTable)
-        .insert(payload)
-        .select('*, category:${SupabaseConstants.categoriesTable}(*)')
-        .single();
+    if (product.categoryId != null && product.categoryId!.trim().isNotEmpty) {
+      payload['category_id'] = product.categoryId!.trim();
+    }
+    if (product.description != null && product.description!.trim().isNotEmpty) {
+      payload['description'] = product.description!.trim();
+    }
+    if (product.originalPrice != null && product.originalPrice! > 0) {
+      payload['original_price'] = product.originalPrice;
+    }
+    if (product.sku != null && product.sku!.trim().isNotEmpty) {
+      payload['sku'] = product.sku!.trim();
+    }
 
-    return ProductModel.fromJson(data);
+    try {
+      final data = await _client
+          .from(SupabaseConstants.productsTable)
+          .insert(payload)
+          .select('*, category:${SupabaseConstants.categoriesTable}(*)')
+          .single();
+
+      return ProductModel.fromJson(data);
+    } on PostgrestException catch (e) {
+      debugPrint('[BuyLanka ProductRepo] createProduct error: code=${e.code}, message=${e.message}, details=${e.details}, hint=${e.hint}');
+      // If category relation join failed, retry with plain select
+      if (e.code == 'PGRST200' || e.message.contains('categories')) {
+        final data = await _client
+            .from(SupabaseConstants.productsTable)
+            .insert(payload)
+            .select()
+            .single();
+        return ProductModel.fromJson(data);
+      }
+      rethrow;
+    }
   }
 
   /// Update an existing product
   Future<ProductModel> updateProduct(ProductModel product) async {
-    final payload = {
-      'category_id': product.categoryId,
+    final payload = <String, dynamic>{
       'title': product.title.trim(),
-      'description': product.description?.trim(),
       'price': product.price,
-      'original_price': product.originalPrice,
       'stock_quantity': product.stockQuantity,
-      'sku': product.sku?.trim(),
       'images': product.images,
       'status': product.isAvailable ? 'published' : 'draft',
       'is_featured': product.isFeatured,
-      'is_available': product.isAvailable,
-      'preparation_time_minutes': product.preparationTimeMinutes,
       'updated_at': DateTime.now().toIso8601String(),
     };
 
-    final data = await _client
-        .from(SupabaseConstants.productsTable)
-        .update(payload)
-        .eq('id', product.id)
-        .select('*, category:${SupabaseConstants.categoriesTable}(*)')
-        .single();
+    if (product.categoryId != null && product.categoryId!.trim().isNotEmpty) {
+      payload['category_id'] = product.categoryId!.trim();
+    } else {
+      payload['category_id'] = null;
+    }
+    if (product.description != null && product.description!.trim().isNotEmpty) {
+      payload['description'] = product.description!.trim();
+    } else {
+      payload['description'] = null;
+    }
+    if (product.originalPrice != null && product.originalPrice! > 0) {
+      payload['original_price'] = product.originalPrice;
+    } else {
+      payload['original_price'] = null;
+    }
+    if (product.sku != null && product.sku!.trim().isNotEmpty) {
+      payload['sku'] = product.sku!.trim();
+    } else {
+      payload['sku'] = null;
+    }
 
-    return ProductModel.fromJson(data);
+    try {
+      final data = await _client
+          .from(SupabaseConstants.productsTable)
+          .update(payload)
+          .eq('id', product.id)
+          .select('*, category:${SupabaseConstants.categoriesTable}(*)')
+          .single();
+
+      return ProductModel.fromJson(data);
+    } on PostgrestException catch (e) {
+      debugPrint('[BuyLanka ProductRepo] updateProduct error: code=${e.code}, message=${e.message}, details=${e.details}, hint=${e.hint}');
+      if (e.code == 'PGRST200' || e.message.contains('categories')) {
+        final data = await _client
+            .from(SupabaseConstants.productsTable)
+            .update(payload)
+            .eq('id', product.id)
+            .select()
+            .single();
+        return ProductModel.fromJson(data);
+      }
+      rethrow;
+    }
   }
 
   /// Quick toggle for product availability
   Future<void> toggleProductAvailability(String productId, bool isAvailable) async {
+    final status = isAvailable ? 'published' : 'draft';
     await _client
         .from(SupabaseConstants.productsTable)
         .update({
-          'is_available': isAvailable,
-          'status': isAvailable ? 'published' : 'draft',
+          'status': status,
           'updated_at': DateTime.now().toIso8601String(),
         })
         .eq('id', productId);

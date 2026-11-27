@@ -159,8 +159,8 @@ class SellerProfileScreen extends ConsumerWidget {
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.support_agent_rounded, color: AppColors.primary),
-                    title: const Text('BuyLanka Vendor Support', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                    subtitle: const Text('support@buylanka.lk • +94 11 234 5678', style: TextStyle(fontSize: 12)),
+                    title: const Text('YUMMY Vendor Support', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                    subtitle: const Text('support@yummy.lk • +94 11 234 5678', style: TextStyle(fontSize: 12)),
                     trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
                     onTap: () {},
                   ),

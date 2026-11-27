@@ -56,7 +56,7 @@ export const adminsService = {
     const trimmedName = payload.fullName.trim()
     const trimmedPhone = payload.phoneNumber?.trim() || null
     const status = payload.status || 'active'
-    const password = payload.password || 'BuyLanka@Admin123'
+    const password = payload.password || 'YUMMY@Admin123'
 
     // 1. Check if an account already exists in profiles with this email
     const { data: existingProfile } = await supabase

@@ -229,13 +229,13 @@ class ShopDetailsScreen extends ConsumerWidget {
                     Row(
                       children: [
                         Text(
-                          CurrencyFormatter.formatLKR(product.price),
+                          CurrencyFormatter.format(product.price),
                           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary),
                         ),
                         if (product.hasDiscount) ...[
                           const SizedBox(width: 8),
                           Text(
-                            CurrencyFormatter.formatLKR(product.originalPrice!),
+                            CurrencyFormatter.format(product.originalPrice!),
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textLight,
@@ -345,7 +345,7 @@ class ShopDetailsScreen extends ConsumerWidget {
                   ],
                 ),
                 Text(
-                  CurrencyFormatter.formatLKR(cartState.totalAmount),
+                  CurrencyFormatter.format(cartState.totalAmount),
                   style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -377,7 +377,7 @@ class _CategoryHeaderDelegate extends SliverPersistentHeaderDelegate {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final cat = categories[index];
           final isSelected = cat == selectedCategory;

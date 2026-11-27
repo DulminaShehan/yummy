@@ -6,7 +6,9 @@ class AddressModel {
   final String phoneNumber;
   final String streetAddress;
   final String city;
-  final String? district;
+  final String? district; // Holds State / Province / Region / District
+  final String? countryCode; // ISO 3166-1 alpha-2 (e.g. 'US', 'GB', 'AE', 'SG', 'LK')
+  final String? postalCode;
   final double? latitude;
   final double? longitude;
   final String? deliveryInstructions;
@@ -23,6 +25,8 @@ class AddressModel {
     required this.streetAddress,
     required this.city,
     this.district,
+    this.countryCode = 'US',
+    this.postalCode,
     this.latitude,
     this.longitude,
     this.deliveryInstructions,
@@ -31,7 +35,17 @@ class AddressModel {
     this.updatedAt,
   });
 
-  String get fullAddressText => '$streetAddress, $city${district != null ? ', $district' : ''}';
+  /// Formatted international address string for display
+  String get fullAddressText {
+    final parts = <String>[
+      if (streetAddress.isNotEmpty) streetAddress,
+      if (city.isNotEmpty) city,
+      if (district != null && district!.isNotEmpty) district!,
+      if (postalCode != null && postalCode!.isNotEmpty) postalCode!,
+      if (countryCode != null && countryCode!.isNotEmpty && countryCode != 'US') countryCode!,
+    ];
+    return parts.isEmpty ? '$streetAddress, $city' : parts.join(', ');
+  }
 
   factory AddressModel.fromJson(Map<String, dynamic> json) {
     return AddressModel(
@@ -41,8 +55,10 @@ class AddressModel {
       recipientName: json['recipient_name'] as String? ?? 'Customer',
       phoneNumber: json['phone_number'] as String? ?? '',
       streetAddress: json['street_address'] as String? ?? '',
-      city: json['city'] as String? ?? 'Colombo',
+      city: json['city'] as String? ?? '',
       district: json['district'] as String?,
+      countryCode: json['country_code'] as String? ?? 'US',
+      postalCode: json['postal_code'] as String?,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       deliveryInstructions: json['delivery_instructions'] as String?,
@@ -75,6 +91,8 @@ class AddressModel {
     String? streetAddress,
     String? city,
     String? district,
+    String? countryCode,
+    String? postalCode,
     double? latitude,
     double? longitude,
     String? deliveryInstructions,
@@ -89,6 +107,8 @@ class AddressModel {
       streetAddress: streetAddress ?? this.streetAddress,
       city: city ?? this.city,
       district: district ?? this.district,
+      countryCode: countryCode ?? this.countryCode,
+      postalCode: postalCode ?? this.postalCode,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       deliveryInstructions: deliveryInstructions ?? this.deliveryInstructions,

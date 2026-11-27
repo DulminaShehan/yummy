@@ -77,15 +77,16 @@ class ShopDetailsController extends StateNotifier<ShopDetailsState> {
     required FavoriteRepository favoriteRepo,
     required ReviewRepository reviewRepo,
     String? customerId,
-  })  : _customerRepo = customerRepo,
-        _favoriteRepo = favoriteRepo,
-        _reviewRepo = reviewRepo,
-        _customerId = customerId,
+  })  : _customerRepo = customerRepo, // ignore: prefer_initializing_formals
+        _favoriteRepo = favoriteRepo, // ignore: prefer_initializing_formals
+        _reviewRepo = reviewRepo, // ignore: prefer_initializing_formals
+        _customerId = customerId, // ignore: prefer_initializing_formals
         super(const ShopDetailsState(isLoading: true)) {
     loadShopDetails();
   }
 
   Future<void> loadShopDetails() async {
+    if (!mounted) return;
     state = state.copyWith(isLoading: true);
     try {
       final shop = await _customerRepo.getShopById(shopId);
@@ -96,6 +97,7 @@ class ShopDetailsController extends StateNotifier<ShopDetailsState> {
         isFav = await _favoriteRepo.isShopFavorite(_customerId, shopId);
       }
 
+      if (!mounted) return;
       state = state.copyWith(
         shop: shop,
         products: products,
@@ -104,17 +106,20 @@ class ShopDetailsController extends StateNotifier<ShopDetailsState> {
         isLoading: false,
       );
     } catch (_) {
+      if (!mounted) return;
       state = state.copyWith(isLoading: false);
     }
   }
 
   void selectCategory(String category) {
+    if (!mounted) return;
     state = state.copyWith(selectedCategory: category);
   }
 
   Future<void> toggleFavorite() async {
     if (_customerId == null) return;
     final newFav = await _favoriteRepo.toggleFavoriteShop(_customerId, shopId);
+    if (!mounted) return;
     state = state.copyWith(isFavorite: newFav);
   }
 }

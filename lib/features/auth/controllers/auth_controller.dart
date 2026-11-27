@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:buylanka/core/errors/auth_error_handler.dart';
 import 'package:buylanka/models/profile_model.dart';
 import 'package:buylanka/models/rider_model.dart';
 import 'package:buylanka/models/seller_model.dart';
@@ -28,10 +29,11 @@ class AuthStateData {
     this.errorMessage,
   });
 
-  bool get isAuthenticated => profile != null && profile!.isActive;
+  bool get isAuthenticated =>
+      profile != null && (profile!.isActive || (profile!.isPending && profile!.role == 'rider'));
   bool get isCustomer => profile != null && profile!.role == 'customer' && profile!.isActive;
   bool get isSeller => profile != null && profile!.role == 'seller' && profile!.isActive;
-  bool get isRider => profile != null && profile!.role == 'rider' && profile!.isActive;
+  bool get isRider => profile != null && profile!.role == 'rider';
 
   AuthStateData copyWith({
     ProfileModel? profile,
@@ -68,8 +70,26 @@ class AuthController extends StateNotifier<AuthStateData> {
     }
 
     try {
-      final profile = await _authRepository.getProfile(user.id);
-      if (profile != null && profile.isActive) {
+      var profile = await _authRepository.getProfile(user.id);
+      if (profile == null) {
+        profile = ProfileModel(
+          id: user.id,
+          fullName: user.userMetadata?['full_name'] ?? 'Valued Customer',
+          email: user.email ?? 'customer@yummy.lk',
+          phoneNumber: user.userMetadata?['phone_number'],
+          role: user.userMetadata?['role'] ?? 'customer',
+          status: 'active',
+        );
+        try {
+          await _authRepository.updateProfile(
+            userId: user.id,
+            fullName: profile.fullName,
+            phoneNumber: profile.phoneNumber,
+          );
+        } catch (_) {}
+      }
+
+      if (profile.isActive || (profile.status == 'pending' && profile.role == 'rider')) {
         if (profile.role == 'customer') {
           state = state.copyWith(profile: profile, isLoading: false);
         } else if (profile.role == 'seller') {
@@ -108,10 +128,10 @@ class AuthController extends StateNotifier<AuthStateData> {
       );
       state = state.copyWith(profile: profile, isLoading: false, clearError: true);
       return true;
-    } catch (e) {
+    } catch (e, stackTrace) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: e.toString().replaceAll('Exception: ', '').replaceAll('AuthException: ', ''),
+        errorMessage: AuthErrorHandler.handle(e, stackTrace: stackTrace, context: 'Customer Sign Up'),
       );
       return false;
     }
@@ -142,16 +162,16 @@ class AuthController extends StateNotifier<AuthStateData> {
       );
       state = state.copyWith(isLoading: false, clearError: true, clearUser: true);
       return true;
-    } catch (e) {
+    } catch (e, stackTrace) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: e.toString().replaceAll('Exception: ', '').replaceAll('AuthException: ', ''),
+        errorMessage: AuthErrorHandler.handle(e, stackTrace: stackTrace, context: 'Seller Sign Up'),
       );
       return false;
     }
   }
 
-  /// Register Delivery Rider Partner (Pending Super Admin Approval)
+  /// Register Delivery Rider Partner
   Future<bool> signUpRider({
     required String fullName,
     required String email,
@@ -163,7 +183,7 @@ class AuthController extends StateNotifier<AuthStateData> {
   }) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      await _authRepository.signUpRider(
+      final profile = await _authRepository.signUpRider(
         fullName: fullName,
         email: email,
         password: password,
@@ -172,12 +192,19 @@ class AuthController extends StateNotifier<AuthStateData> {
         drivingLicenseNumber: drivingLicenseNumber,
         phoneNumber: phoneNumber,
       );
-      state = state.copyWith(isLoading: false, clearError: true, clearUser: true);
+      var rider = await _riderRepository.getRiderById(profile.id);
+      rider ??= await _riderRepository.createDefaultRiderRecord(
+        riderId: profile.id,
+        vehicleType: vehicleType,
+        vehicleNumber: vehicleNumber,
+        drivingLicenseNumber: drivingLicenseNumber ?? 'B1234567',
+      );
+      state = state.copyWith(profile: profile, rider: rider, isLoading: false, clearError: true);
       return true;
-    } catch (e) {
+    } catch (e, stackTrace) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: e.toString().replaceAll('Exception: ', '').replaceAll('AuthException: ', ''),
+        errorMessage: AuthErrorHandler.handle(e, stackTrace: stackTrace, context: 'Rider Sign Up'),
       );
       return false;
     }
@@ -194,12 +221,21 @@ class AuthController extends StateNotifier<AuthStateData> {
         email: email,
         password: password,
       );
-      state = state.copyWith(profile: profile, isLoading: false, clearError: true);
+      if (profile.role == 'rider') {
+        var rider = await _riderRepository.getRiderById(profile.id);
+        rider ??= await _riderRepository.createDefaultRiderRecord(riderId: profile.id);
+        state = state.copyWith(profile: profile, rider: rider, isLoading: false, clearError: true);
+      } else if (profile.role == 'seller') {
+        final seller = await _authRepository.getSellerDetails(profile.id);
+        state = state.copyWith(profile: profile, seller: seller, isLoading: false, clearError: true);
+      } else {
+        state = state.copyWith(profile: profile, isLoading: false, clearError: true);
+      }
       return true;
-    } catch (e) {
+    } catch (e, stackTrace) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: e.toString().replaceAll('Exception: ', '').replaceAll('AuthException: ', ''),
+        errorMessage: AuthErrorHandler.handle(e, stackTrace: stackTrace, context: 'Customer Sign In'),
       );
       return false;
     }
@@ -244,10 +280,40 @@ class AuthController extends StateNotifier<AuthStateData> {
         state = state.copyWith(profile: profile, isLoading: false, clearError: true);
         return true;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: e.toString().replaceAll('Exception: ', '').replaceAll('AuthException: ', ''),
+        errorMessage: AuthErrorHandler.handle(e, stackTrace: stackTrace, context: 'Universal Sign In'),
+      );
+      return false;
+    }
+  }
+
+  /// Seller / Restaurant Sign-In with Role Verification
+  Future<bool> signInSeller({
+    required String email,
+    required String password,
+  }) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+
+    try {
+      final profile = await _authRepository.signInSeller(
+        email: email,
+        password: password,
+      );
+      final seller = await _authRepository.getSellerDetails(profile.id);
+
+      state = state.copyWith(
+        profile: profile,
+        seller: seller,
+        isLoading: false,
+        clearError: true,
+      );
+      return true;
+    } catch (e, stackTrace) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: AuthErrorHandler.handle(e, stackTrace: stackTrace, context: 'Seller Sign In'),
       );
       return false;
     }
@@ -276,10 +342,10 @@ class AuthController extends StateNotifier<AuthStateData> {
         clearError: true,
       );
       return true;
-    } catch (e) {
+    } catch (e, stackTrace) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: e.toString().replaceAll('Exception: ', '').replaceAll('AuthException: ', ''),
+        errorMessage: AuthErrorHandler.handle(e, stackTrace: stackTrace, context: 'Rider Sign In'),
       );
       return false;
     }
@@ -303,6 +369,48 @@ class AuthController extends StateNotifier<AuthStateData> {
     await refreshProfile();
   }
 
+  /// Update ordinary rider profile fields
+  Future<void> updateRiderProfileDetails({
+    required String fullName,
+    required String phoneNumber,
+    String? residentialAddress,
+    String? vehicleModel,
+    String? vehicleColor,
+    String? avatarUrl,
+  }) async {
+    final user = _authRepository.currentUser;
+    if (user == null) return;
+
+    await _riderRepository.updateRiderProfile(
+      riderId: user.id,
+      fullName: fullName,
+      phoneNumber: phoneNumber,
+      residentialAddress: residentialAddress,
+      vehicleModel: vehicleModel,
+      vehicleColor: vehicleColor,
+      avatarUrl: avatarUrl,
+    );
+
+    await refreshProfile();
+  }
+
+  /// Submit sensitive changes for admin approval
+  Future<void> submitRiderSensitiveChangeRequest({
+    required Map<String, dynamic> requestedChanges,
+    required Map<String, dynamic> previousValues,
+  }) async {
+    final user = _authRepository.currentUser;
+    if (user == null) return;
+
+    await _riderRepository.submitSensitiveChangeRequest(
+      riderId: user.id,
+      requestedChanges: requestedChanges,
+      previousValues: previousValues,
+    );
+
+    await refreshProfile();
+  }
+
   Future<void> refreshProfile() async {
     final user = _authRepository.currentUser;
     if (user == null) return;
@@ -316,6 +424,38 @@ class AuthController extends StateNotifier<AuthStateData> {
     } else if (profile?.role == 'rider') {
       final rider = await _riderRepository.getRiderById(user.id);
       state = state.copyWith(profile: profile, rider: rider);
+    }
+  }
+
+  Future<bool> sendPasswordReset(String email) async {
+    try {
+      await _authRepository.sendPasswordReset(email);
+      return true;
+    } catch (e, stackTrace) {
+      state = state.copyWith(
+        errorMessage: AuthErrorHandler.handle(e, stackTrace: stackTrace, context: 'Password Reset'),
+      );
+      return false;
+    }
+  }
+
+  /// Sets rider profile and state directly (e.g. after registration)
+  void setRiderState({
+    required ProfileModel profile,
+    required RiderModel rider,
+  }) {
+    state = state.copyWith(
+      profile: profile,
+      rider: rider,
+      isLoading: false,
+      clearError: true,
+    );
+  }
+
+  /// Clears active error message state
+  void clearError() {
+    if (state.errorMessage != null) {
+      state = state.copyWith(clearError: true);
     }
   }
 

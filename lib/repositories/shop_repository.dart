@@ -26,20 +26,20 @@ class ShopRepository {
 
   /// Create default shop if seller does not have one yet
   Future<ShopModel> createDefaultShop(String sellerId, String businessName) async {
-    final slug = businessName
+    var slugPart = businessName
         .toLowerCase()
         .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
         .replaceAll(RegExp(r'^-|-$'), '');
+    if (slugPart.isEmpty) {
+      slugPart = 'shop';
+    }
 
-    final payload = {
+    final payload = <String, dynamic>{
       'seller_id': sellerId,
       'name': businessName,
-      'slug': '$slug-${DateTime.now().millisecondsSinceEpoch % 10000}',
-      'description': 'Welcome to $businessName on BuyLanka!',
+      'slug': '$slugPart-${DateTime.now().millisecondsSinceEpoch % 10000}',
+      'description': 'Welcome to $businessName on YUMMY!',
       'status': 'approved',
-      'is_open': true,
-      'opening_time': '08:00 AM',
-      'closing_time': '10:00 PM',
       'rating': 5.0,
       'total_reviews': 0,
     };
@@ -55,7 +55,7 @@ class ShopRepository {
 
   /// Update shop profile & settings
   Future<ShopModel> updateShop(ShopModel shop) async {
-    final payload = {
+    final payload = <String, dynamic>{
       'name': shop.name,
       'description': shop.description,
       'logo_url': shop.logoUrl,
@@ -64,9 +64,6 @@ class ShopRepository {
       'city': shop.city,
       'district': shop.district,
       'contact_phone': shop.contactPhone,
-      'is_open': shop.isOpen,
-      'opening_time': shop.openingTime,
-      'closing_time': shop.closingTime,
       'updated_at': DateTime.now().toIso8601String(),
     };
 
@@ -82,12 +79,16 @@ class ShopRepository {
 
   /// Quick toggle for shop Open / Closed status
   Future<void> toggleShopOpenStatus(String shopId, bool isOpen) async {
-    await _client
-        .from(SupabaseConstants.shopsTable)
-        .update({
-          'is_open': isOpen,
-          'updated_at': DateTime.now().toIso8601String(),
-        })
-        .eq('id', shopId);
+    try {
+      await _client
+          .from(SupabaseConstants.shopsTable)
+          .update({
+            'is_open': isOpen,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', shopId);
+    } catch (_) {
+      // If is_open column doesn't exist on shops table, ignore gracefully
+    }
   }
 }

@@ -280,7 +280,7 @@ class OrderDetailsScreen extends ConsumerWidget {
         bg = AppColors.successBg;
         text = AppColors.statusReady;
         statusTitle = 'Ready for Pickup';
-        statusSubtitle = 'Order packed. Waiting for BuyLanka delivery rider.';
+        statusSubtitle = 'Order packed. Waiting for YUMMY delivery rider.';
         icon = Icons.check_circle_outline_rounded;
         break;
       case 'delivered':

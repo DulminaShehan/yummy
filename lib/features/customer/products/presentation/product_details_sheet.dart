@@ -139,7 +139,7 @@ class _ProductDetailsSheetState extends ConsumerState<ProductDetailsSheet> {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          CurrencyFormatter.formatLKR(product.price),
+                          CurrencyFormatter.format(product.price),
                           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary),
                         ),
                       ],
@@ -236,7 +236,7 @@ class _ProductDetailsSheetState extends ConsumerState<ProductDetailsSheet> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text('Add to Cart', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                                  Text(CurrencyFormatter.formatLKR(totalPrice), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                  Text(CurrencyFormatter.format(totalPrice), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                                 ],
                               ),
                             ),

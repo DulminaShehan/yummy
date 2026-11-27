@@ -121,7 +121,7 @@ export const OrdersPage: React.FC = () => {
                 <th>Order #</th>
                 <th>Customer</th>
                 <th>Storefront / Vendor</th>
-                <th>Total (LKR)</th>
+                <th>Total</th>
                 <th>Payment</th>
                 <th>Order Status</th>
                 <th>Date Placed</th>
@@ -249,7 +249,7 @@ export const OrdersPage: React.FC = () => {
               <p><strong>Recipient:</strong> {shippingInfo?.fullName || selectedOrder.customer?.full_name}</p>
               <p><strong>Contact:</strong> {shippingInfo?.phone || selectedOrder.customer?.phone_number}</p>
               <p><strong>Address:</strong> {shippingInfo?.addressLine || shippingInfo?.line || 'Colombo'}</p>
-              <p><strong>City & District:</strong> {shippingInfo?.city || 'Colombo'}, {shippingInfo?.district || 'Western Province'}</p>
+              <p><strong>City & District:</strong> {shippingInfo?.city || 'San Francisco'}, {shippingInfo?.district || 'California'}</p>
               {selectedOrder.customer_notes && (
                 <p style={{ marginTop: '0.5rem', color: 'var(--accent)', fontStyle: 'italic' }}>
                   Note: "{selectedOrder.customer_notes}"
@@ -274,7 +274,7 @@ export const OrdersPage: React.FC = () => {
               )}
               <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '0.25rem 0' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.125rem', fontWeight: 800 }}>
-                <span>Grand Total (LKR):</span>
+                <span>Grand Total:</span>
                 <span style={{ color: 'var(--primary)' }}>{formatLKR(selectedOrder.total_amount)}</span>
               </div>
             </div>
